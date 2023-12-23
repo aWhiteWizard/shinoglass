@@ -1381,8 +1381,11 @@ int32_t DEV_I2C_Write(unsigned char i2c_bus, unsigned char client_addr,uint16_t 
 
               if((retries >= RE_CONT))
               {
-								  printf("\r\n%s, %d: CHIP_ADDR 0x%x REG_ADDR : 0x%04x I2C Write: 0x%04X, %d bytes failed, errcode: %d! Process reset.", __FUNCTION__, __LINE__,client_addr, reg_addr  , (((uint16_t)(buf[0] << 8)) | buf[1]), len-2, ret);
-                  I2C_PRIMARY_GPIO_IN();
+									if(len == 2)
+										printf("\r\n%s, %d: CHIP_ADDR 0x%x REG_ADDR : 0x%04x I2C Write: 0x%04X, %d bytes failed, errcode: %d! Process reset.", __FUNCTION__, __LINE__,client_addr, reg_addr  , (((uint16_t)(buf[0] << 8)) | buf[1]), len-2, ret);
+                  if(len == 1)
+											printf("\r\n%s, %d: CHIP_ADDR 0x%x REG_ADDR : 0x%x I2C Write: 0x%X, %d bytes failed, errcode: %d! Process reset.", __FUNCTION__, __LINE__,client_addr, (unsigned char)reg_addr  , buf[0], 1, ret);									
+									I2C_PRIMARY_GPIO_IN();
                   return -1;
               }
               I2C_PRIMARY_GPIO_IN();

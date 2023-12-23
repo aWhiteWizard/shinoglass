@@ -35,7 +35,7 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
 OF SUCH DAMAGE.
 */
 
-#include "TCA9548.h"
+
 #include "TCA6408.h"
 #include "dev_iic.h"
 #include "dev_key.h"
@@ -47,7 +47,7 @@ OF SUCH DAMAGE.
 #include "main.h"
 #include "gd32f303e_eval.h"
 #include "PCA9544.h"
-
+#include "sabre9018.h"
 /*!
     \brief      toggle the led every 500ms
     \param[in]  none
@@ -106,9 +106,8 @@ int main(void)
     pannel_init();  
     tca9548_i2c_set(TCA9548_ALL_DISABLE);
 		
-    PCA9544_i2c_init();
-		PCA9544_i2c_set(PCA9544_CHANNEL_0);
-
+    pca9544_i2c_init();
+		sabre9018_init();
     while(1)
     {
 
