@@ -1,0 +1,55 @@
+#ifndef _TCA9548_H_
+#define _TCA9548_H_
+
+
+
+#include "dev_conf.h"
+
+#define TCA9548_ALL_CHANNEL_DISABLE 0x00
+#define TCA9548_CHANNEL_0_ENABLE 0x01
+#define TCA9548_CHANNEL_1_ENABLE 0x02
+#define TCA9548_CHANNEL_2_ENABLE 0x04
+#define TCA9548_CHANNEL_3_ENABLE 0x08
+#define TCA9548_CHANNEL_4_ENABLE 0x10
+#define TCA9548_CHANNEL_5_ENABLE 0x20
+#define TCA9548_CHANNEL_6_ENABLE 0x40
+#define TCA9548_CHANNEL_7_ENABLE 0x80
+
+typedef enum Tca9548Channel
+{
+	TCA9548_CHANNEL_0,
+	TCA9548_CHANNEL_1,
+	TCA9548_CHANNEL_2,
+	TCA9548_CHANNEL_3,
+	TCA9548_CHANNEL_4,
+	TCA9548_CHANNEL_5,
+	TCA9548_CHANNEL_6,
+	TCA9548_CHANNEL_7,
+	TCA9548_ALL_DISABLE 
+}Tca9548Channel;
+
+
+int tca9548_i2c_set(enum Tca9548Channel channel);
+int tca9548_i2c_init(void);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#endif
+
