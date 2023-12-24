@@ -103,7 +103,7 @@ int main(void)
 
 		delay_1ms(1000);
 	
-    pannel_init();  
+//    pannel_init();  
     tca9548_i2c_set(TCA9548_ALL_DISABLE);
 		
     pca9544_i2c_init();
