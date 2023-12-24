@@ -2,8 +2,18 @@
 /*
 *	@brife sabre9018 init
 */
+
+int sabre9018_print(unsigned char reg)
+{
+			unsigned char sabre_status;
+		DEV_I2C_Read(SABRE9018_IIC_BUS, (unsigned char)SABRE9018_IIC_ADDR, reg, 1,&sabre_status, 1);
+	    printf("\r\n%s, %d: [DEBUG] 0x%x : 0x%x", __FUNCTION__, __LINE__, reg, sabre_status);
+}
+
 int sabre9018_init(void)
 {
+
+		
 		pca9544_i2c_set(SABRE9018_CHANNEL);
 		DEV_I2C_Write(SABRE9018_IIC_BUS, (unsigned char)SABRE9018_IIC_ADDR, SABRE9018_REG_SYSTEMSET, 1,				   																	&sabre9018_init_reg[0],  1);
 		DEV_I2C_Write(SABRE9018_IIC_BUS, (unsigned char)SABRE9018_IIC_ADDR, SABRE9018_REG_INPUTCONFIG, 1, 		   																	&sabre9018_init_reg[1],  1);
@@ -44,8 +54,20 @@ int sabre9018_init(void)
 		DEV_I2C_Write(SABRE9018_IIC_BUS, (unsigned char)SABRE9018_IIC_ADDR, SABRE9018_REG_HEADPHONEAMPLIFERCTRL, 1, 															&sabre9018_init_reg[36], 1);
 		DEV_I2C_Write(SABRE9018_IIC_BUS, (unsigned char)SABRE9018_IIC_ADDR, SABRE9018_REG_SLIMBUSCTRL, 1, 																				&sabre9018_init_reg[37], 1);
 		delay_1ms(5);
+		sabre9018_print(SABRE9018_REG_SYSTEMSET);
+		sabre9018_print(SABRE9018_REG_INPUTCONFIG);
+		sabre9018_print(SABRE9018_REG_SOFTVOLUMECTRL_1);
+		sabre9018_print(SABRE9018_REG_SOFTVOLUMECTRL_2);
+		sabre9018_print(SABRE9018_REG_SOFTVOLUMECTRL_3);
+		sabre9018_print(SABRE9018_REG_MASTERMODECTRL);
+		sabre9018_print(SABRE9018_REG_CHANNELMAPPING);
+		sabre9018_print(SABRE9018_REG_VOLUME_1);
+		sabre9018_print(SABRE9018_REG_VOLUME_2);
+		sabre9018_print(SABRE9018_REG_CHIPSTATUS);	
+		sabre9018_print(SABRE9018_REG_READONLY);	
+
 		pca9544_i2c_set(PCA9544_CHANNEL_DISABLED);
-    printf("\r\n%s, %d: [DEBUG] SABRE9018 Set done.", __FUNCTION__, __LINE__);
+    printf("\r\n%s, %d: [DEBUG] SABRE9018 Set done", __FUNCTION__, __LINE__);
 		return 0;
 }
 
