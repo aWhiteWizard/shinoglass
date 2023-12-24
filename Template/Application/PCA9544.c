@@ -15,8 +15,7 @@
 //#define AW_ENN_1()  gpio_bit_set(DEV_ENN_GPIO_PORT,DEV_ENN_GPIO_PIN)	
 //#define AW_ENN_0()  gpio_bit_reset(DEV_ENN_GPIO_PORT,DEV_ENN_GPIO_PIN)	
 
-#define PCA9544_IIC_ADDR  (0x70<<1)
-#define PCA9544_IIC_BUS 0
+#define PCA9544_IIC_ADDR  (0x74<<1)
 
 int pca9544_i2c_set(enum PCA9544Channel channel)
 {

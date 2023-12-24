@@ -81,7 +81,8 @@ void led_spark(void)
 
 int main(void)
 {
-		unsigned int ret;
+		int ret;
+		unsigned char buf;
     /* configure systick */
 		nvic_vector_table_set(NVIC_VECTTAB_FLASH,0x4000);
 	
@@ -97,7 +98,6 @@ int main(void)
 		GPIO_INIT();
     I2C_Init();
 	
-	//
     tca9548_i2c_init();
 		tca6408_i2c_init();
 
@@ -108,6 +108,14 @@ int main(void)
 		
     pca9544_i2c_init();
 		sabre9018_init();
+//		PCA9544Channel test = PCA9544_CHANNEL_0;
+//		pca9544_i2c_set(test);
+//		delay_1ms(5);
+//		ret = DEV_I2C_Read(0, 0x68<<1, 0x01, 1, &buf, 1);
+//		if(ret >= 0)
+//			printf("\r\n [DEBUG] test 9544 Channel %d, get buf=0x%x",test,  buf);
+//		else	
+//			printf("\r\n [DEBUG] test 9544 Channel %d, Failed, ret = %d",test , ret);
     while(1)
     {
 

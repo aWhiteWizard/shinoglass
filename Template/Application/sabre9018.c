@@ -45,6 +45,7 @@ int sabre9018_init(void)
 		DEV_I2C_Write(SABRE9018_IIC_BUS, (unsigned char)SABRE9018_IIC_ADDR, SABRE9018_REG_SLIMBUSCTRL, 1, 																				&sabre9018_init_reg[37], 1);
 		delay_1ms(5);
 		pca9544_i2c_set(PCA9544_CHANNEL_DISABLED);
+    printf("\r\n%s, %d: [DEBUG] SABRE9018 Set done.", __FUNCTION__, __LINE__);
 		return 0;
 }
 

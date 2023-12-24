@@ -5,7 +5,7 @@
 
 #include "dev_conf.h"
 
-#define PCA9544_IIC_BUS 0
+#define PCA9544_IIC_BUS 1
 #define PCA9544_MAX_DEV_COUNT 4
 
 
