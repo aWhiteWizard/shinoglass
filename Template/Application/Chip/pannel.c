@@ -4,6 +4,7 @@
 #include "dev_iic.h"
 #include "tca6408.h"
 #include "oled.h"
+#include "main.h"
 
 #define Delay_ms(time) delay_1ms(time)  
 
@@ -406,12 +407,12 @@ void set_bright(enum OLED_NUM oled_num, uint16_t bright)
       curbright = (BRIGHT_LEVEL_MAX/ADJUST_LEVEL_MAX)*bright;
     
     printf("\r\n curbright=%d bright=%d",curbright,bright);
-    bright_hi = (curbright&0xff00)>>8;
-    bright_lo = curbright&0xff;
+    bright_hi = (bright&0xff00)>>8;
+    bright_lo = bright&0xff;
     
-    if(bright==7){
-        bright_hi = 0x03;bright_lo = 0xff;
-    }
+//    if(bright==7){
+//        bright_hi = 0x03;bright_lo = 0xff;
+//    }
 
     printf("\r\n bright_hi=%02X bright_lo=%02X ",bright_hi,bright_lo);
     

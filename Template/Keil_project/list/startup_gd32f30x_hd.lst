@@ -571,9 +571,9 @@ ARM Macro Assembler    Page 9
   365 0000001C                 END
               00000000 
               00000000 
-Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M4 --apcs=interw
-ork --depend=..\..\..\shinoglass_output\startup_gd32f30x_hd.d -o..\..\..\shinog
-lass_output\startup_gd32f30x_hd.o -ID:\Program_files\MDK5\Packs\GigaDevice\GD32
+Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M4.fp.sp --apcs=
+interwork --depend=..\..\..\shinoglass_hex\startup_gd32f30x_hd.d -o..\..\..\shi
+noglass_hex\startup_gd32f30x_hd.o -ID:\Program_files\MDK5\Packs\GigaDevice\GD32
 F30x_DFP\2.2.3\Device\Include --predefine="__MICROLIB SETA 1" --predefine="__UV
 ISION_VERSION SETA 538" --predefine="GD32F30X_HD SETA 1" --list=.\list\startup_
 gd32f30x_hd.lst ..\..\Firmware\CMSIS\GD\GD32F30x\Source\ARM\startup_gd32f30x_hd
@@ -1713,4 +1713,4 @@ d32f30x_hd.s
 d32f30x_hd.s
 Comment: __main used once
 2 symbols
-422 symbols in table
+423 symbols in table

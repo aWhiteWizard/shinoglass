@@ -3,6 +3,7 @@
 *	@brife sabre9018 init
 */
 
+#define Delay_ms(time) vTaskDelay(time)
 int sabre9018_print(unsigned char reg)
 {
 			unsigned char sabre_status;
@@ -81,11 +82,12 @@ int sabre9018_init(void)
 * @param reg_addr Data of reg
 * @param send_data write to sabre9018
 */
-int sabre9018_write(unsigned char reg_addr, unsigned char send_data)
+int sabre9018_volume_set(unsigned char send_data)
 {
 		int ret;
 		pca9544_i2c_set(SABRE9018_CHANNEL);
-		ret = DEV_I2C_Write(SABRE9018_IIC_BUS, (unsigned char)SABRE9018_IIC_ADDR, reg_addr, 1, &send_data, 1);
+		ret = DEV_I2C_Write(SABRE9018_IIC_BUS, (unsigned char)SABRE9018_IIC_ADDR, SABRE9018_REG_VOLUME_1, 1, &send_data, 1);
+		ret = DEV_I2C_Write(SABRE9018_IIC_BUS, (unsigned char)SABRE9018_IIC_ADDR, SABRE9018_REG_VOLUME_2, 1, &send_data, 1);
 		if(ret != 0)
 		{
 			printf("\r\n [ERROR] sabre9018 Write Error ,ret = %d,write = 0x%x", ret, send_data);

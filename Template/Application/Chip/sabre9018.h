@@ -5,7 +5,7 @@
 #include "dev_conf.h"
 #include "PCA9544.h"
 #include "dev_iic.h"
-#include "systick.h"
+#include "main.h"
 
 /*
 	SABRE9018 at 0 channel of 9548
@@ -125,8 +125,9 @@ static unsigned char sabre9018_init_reg[64]=
 };
 
 int sabre9018_init(void);
-int sabre9018_write(unsigned char reg_addr, unsigned char send_data);
+int sabre9018_volume_set(unsigned char send_data);
 int sabre9018_read(unsigned char reg_addr, unsigned char *read_data, int len);
+int sabre9018_print(unsigned char reg);
 
 #endif
 

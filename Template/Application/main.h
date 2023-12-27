@@ -37,8 +37,17 @@ OF SUCH DAMAGE.
 
 #ifndef MAIN_H
 #define MAIN_H
+/*ROTS Handfiles*/
+#include "FreeRTOS.h"
+#include "task.h"
+#include "queue.h"
+#include "semphr.h"
+#include "event_groups.h"
+#include "systick.h"
 
-/* led spark function */
-void led_spark(void);
+
+void KeyValue_set_task(void * pvParameters);
+void Log_print_task(void * pvParameters);
+void USART_cmd_task(void * pvParameters);
 
 #endif /* MAIN_H */

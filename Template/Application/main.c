@@ -38,7 +38,6 @@ OF SUCH DAMAGE.
 
 #include "TCA6408.h"
 #include "dev_iic.h"
-#include "dev_key.h"
 #include "TCA9548.h"
 #include "pannel.h"
 #include "gd32f30x.h"
@@ -48,28 +47,101 @@ OF SUCH DAMAGE.
 #include "gd32f303e_eval.h"
 #include "PCA9544.h"
 #include "sabre9018.h"
+#include "dev_key_led.h"
+
+extern int earphone_volume;
+extern int earphone_volume_reg;
+extern int oled_bright;
+extern int oled_bright_reg;
+
+SemaphoreHandle_t xBinarySemaphore;
+QueueHandle_t xQueue;
+
+TaskHandle_t KeyValueTask_Handle;
+TaskHandle_t LogPrintTask_Handle;
+TaskHandle_t USARTCMDTask_Handle;
+
+#define KeyValue_PRIO (tskIDLE_PRIORITY + 2)
+#define LogPrint_PRIO (tskIDLE_PRIORITY + 2)
+#define UsartCmd_PRIO (tskIDLE_PRIORITY + 1)
 /*!
-    \brief      toggle the led every 500ms
+    \brief      main init
     \param[in]  none
     \param[out] none
     \retval     none
 */
-void led_spark(void)
+
+void USART_cmd_task(void * pvParameters)
 {
-    static __IO uint32_t timingdelaylocal = 0U;
+	char receive_buf[128];
+	printf("\r\n USART_cmd_task");
 
-    if(timingdelaylocal){
+	while(1)
+	{
+		scanf("%s", receive_buf);
+		if(receive_buf[0] == 0x01)
+		{
+			sabre9018_print(SABRE9018_REG_VOLUME_1);
+			sabre9018_print(SABRE9018_REG_VOLUME_2);
+			sabre9018_print(SABRE9018_REG_CHIPSTATUS);	
+			sabre9018_print(SABRE9018_REG_READONLY);	
+		}
+		
+		if(receive_buf[0] == 0x08)
+				earphone_volume = receive_buf[1];
+		if(receive_buf[0] == 0x0F)
+				oled_bright = receive_buf[1];
+		vTaskDelay(200);
+	}
+}
 
-        if(timingdelaylocal < 500U){
-            gd_eval_led_on(LED2);
-        }else{
-            gd_eval_led_off(LED2);
-        }
+void KeyValue_set_task(void * pvParameters)
+{
+	while(1)
+	{
+			if(earphone_volume != earphone_volume_reg)
+			{	
+					earphone_volume_reg = earphone_volume;
+					sabre9018_volume_set(earphone_volume_reg);
+					printf("\r\n earphone_volume value = %d", earphone_volume_reg);
+			}
+			vTaskDelay(200);
+	}
+}
 
-        timingdelaylocal--;
-    }else{
-        timingdelaylocal = 1000U;
-    }
+void Log_print_task(void * pvParameters)
+{	
+	while(1)
+	{
+			if(oled_bright_reg != oled_bright*10)
+			{	
+					oled_bright_reg = oled_bright*10;
+					set_bright(OLED_0, oled_bright_reg);
+					set_bright(OLED_1, oled_bright_reg);
+					printf("\r\n oled_bright value = %d", oled_bright_reg);
+			}
+			vTaskDelay(100);
+	}
+}
+
+
+void system_init(void)
+{
+    gd_eval_com_init(EVAL_COM2);
+		/* print out the clock frequency of system, AHB, APB1 and APB2 */
+    printf("\r\nCK_SYS is %d", rcu_clock_freq_get(CK_SYS));
+    printf("\r\nCK_AHB is %d", rcu_clock_freq_get(CK_AHB));
+    printf("\r\nCK_APB1 is %d", rcu_clock_freq_get(CK_APB1));
+    printf("\r\nCK_APB2 is %d", rcu_clock_freq_get(CK_APB2));
+		GPIO_INIT();
+    I2C_Init();
+//	
+    tca9548_i2c_init();
+		tca6408_i2c_init();
+    pannel_init();  
+    tca9548_i2c_set(TCA9548_ALL_DISABLE);
+    pca9544_i2c_init();
+		sabre9018_init();
 }
 
 /*!
@@ -78,44 +150,23 @@ void led_spark(void)
     \param[out] none
     \retval     none
 */
-
 int main(void)
 {
-		int ret;
-		unsigned char buf;
-    /* configure systick */
-		nvic_vector_table_set(NVIC_VECTTAB_FLASH,0x4000);
-	
-    systick_config();
-    gd_eval_com_init(EVAL_COM2);
-        /* print out the clock frequency of system, AHB, APB1 and APB2 */
-    delay_1ms(10);
-		printf("\r\n  CK_SYS is %d", ret);
-    printf("\r\nCK_SYS is %d", rcu_clock_freq_get(CK_SYS));
-    printf("\r\nCK_AHB is %d", rcu_clock_freq_get(CK_AHB));
-    printf("\r\nCK_APB1 is %d", rcu_clock_freq_get(CK_APB1));
-    printf("\r\nCK_APB2 is %d", rcu_clock_freq_get(CK_APB2));
-		GPIO_INIT();
-    I2C_Init();
-	
-    tca9548_i2c_init();
-		tca6408_i2c_init();
-
-		delay_1ms(1000);
-	
-//    pannel_init();  
-    tca9548_i2c_set(TCA9548_ALL_DISABLE);
+		system_init();
+		xBinarySemaphore = xSemaphoreCreateBinary();
 		
-    pca9544_i2c_init();
-		sabre9018_init();
-//		PCA9544Channel test = PCA9544_CHANNEL_0;
-//		pca9544_i2c_set(test);
-//		delay_1ms(5);
-//		ret = DEV_I2C_Read(0, 0x68<<1, 0x01, 1, &buf, 1);
-//		if(ret >= 0)
-//			printf("\r\n [DEBUG] test 9544 Channel %d, get buf=0x%x",test,  buf);
-//		else	
-//			printf("\r\n [DEBUG] test 9544 Channel %d, Failed, ret = %d",test , ret);
+		if(xBinarySemaphore != NULL)
+		{
+				xTaskCreate(KeyValue_set_task, "KeyValue_task", configMINIMAL_STACK_SIZE, NULL, KeyValue_PRIO,(TaskHandle_t *)KeyValueTask_Handle);
+				xTaskCreate(Log_print_task, "LogPrint_task", configMINIMAL_STACK_SIZE, NULL, LogPrint_PRIO,(TaskHandle_t *)LogPrintTask_Handle);
+				xTaskCreate(USART_cmd_task, "LogPrint_task", configMINIMAL_STACK_SIZE, NULL, UsartCmd_PRIO,(TaskHandle_t *)USARTCMDTask_Handle);
+			
+				vTaskStartScheduler();
+		}
+		else
+		{
+			
+		}
     while(1)
     {
 
@@ -129,4 +180,12 @@ int fputc(int ch, FILE *f)
     while(RESET == usart_flag_get(EVAL_COM2, USART_FLAG_TBE));
 
     return ch;
+}
+///重定向c库函数scanf到串口重写向后可使用scanf、getchar等函数
+int fgetc(FILE *f)
+{
+		/* 等待串口输入数据 */
+		while (usart_flag_get(EVAL_COM2, USART_FLAG_RBNE) == RESET);
+
+		return (int)usart_data_receive(EVAL_COM2);
 }

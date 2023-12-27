@@ -14,7 +14,7 @@
 #define DSC_25442544_75Hz      0
 
 #define BRIGHT_LEVEL_MAX  1024
-#define ADJUST_LEVEL_MAX  7
+#define ADJUST_LEVEL_MAX  1024
 #define DEFAULT_BRT_LEVEL 7
 
 typedef enum 

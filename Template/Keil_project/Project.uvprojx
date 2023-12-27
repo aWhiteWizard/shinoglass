@@ -18,12 +18,12 @@
           <Vendor>GigaDevice</Vendor>
           <PackID>GigaDevice.GD32F30x_DFP.2.2.3</PackID>
           <PackURL>https://gd32mcu.com/data/documents/pack/</PackURL>
-          <Cpu>IRAM(0x20000000-0x2000FFFF)IROM(0x08000000-0x0807FFFF) CLOCK(16000000) CPUTYPE("Cortex-M4") </Cpu>
+          <Cpu>IRAM(0x20000000,0x010000) IROM(0x08000000,0x080000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
-          <StartupFile>"Startup\GD\GD32F30x\startup_gd32f30x_hd.s" ("GD32F30x Startup Code")</StartupFile>
-          <FlashDriverDll>UL2CM3(-O207 -S0 -C0 -FO7 -FD20000000 -FC800 -FN1 -FF0GD32F30x_HD -FS08000000 -FL080000)</FlashDriverDll>
+          <StartupFile></StartupFile>
+          <FlashDriverDll>UL2CM3(-S0 -C0 -P0 -FD20000000 -FC1000 -FN1 -FF0GD32F30x_HD -FS08000000 -FL080000 -FP0($$Device:GD32F303RE$Flash\GD32F30x_HD.FLM))</FlashDriverDll>
           <DeviceId>0</DeviceId>
-          <RegisterFile>gd32f30x.h</RegisterFile>
+          <RegisterFile>$$Device:GD32F303RE$Device\Include\gd32f30x.h</RegisterFile>
           <MemoryEnv></MemoryEnv>
           <Cmp></Cmp>
           <Asm></Asm>
@@ -33,14 +33,14 @@
           <SLE66CMisc></SLE66CMisc>
           <SLE66AMisc></SLE66AMisc>
           <SLE66LinkerMisc></SLE66LinkerMisc>
-          <SFDFile>SFD\GD\GD32F30x\GD32F30x_HD.SFR</SFDFile>
+          <SFDFile>$$Device:GD32F303RE$SVD\GD32F30x_HD.svd</SFDFile>
           <bCustSvd>0</bCustSvd>
           <UseEnv>0</UseEnv>
           <BinPath></BinPath>
           <IncludePath></IncludePath>
           <LibPath></LibPath>
-          <RegisterFilePath>GD\GD32F30x\</RegisterFilePath>
-          <DBRegisterFilePath>GD\GD32F30x\</DBRegisterFilePath>
+          <RegisterFilePath></RegisterFilePath>
+          <DBRegisterFilePath></DBRegisterFilePath>
           <TargetStatus>
             <Error>0</Error>
             <ExitCodeStop>0</ExitCodeStop>
@@ -48,7 +48,7 @@
             <NotGenerated>0</NotGenerated>
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
-          <OutputDirectory>..\..\..\shinoglass_output\</OutputDirectory>
+          <OutputDirectory>..\..\..\shinoglass_hex\</OutputDirectory>
           <OutputName>Project</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
@@ -110,13 +110,13 @@
         </CommonProperty>
         <DllOption>
           <SimDllName>SARMCM3.DLL</SimDllName>
-          <SimDllArguments> -REMAP</SimDllArguments>
+          <SimDllArguments> -REMAP -MPU</SimDllArguments>
           <SimDlgDll>DCM.DLL</SimDlgDll>
-          <SimDlgDllArguments>-pCM3</SimDlgDllArguments>
+          <SimDlgDllArguments>-pCM4</SimDlgDllArguments>
           <TargetDllName>SARMCM3.DLL</TargetDllName>
-          <TargetDllArguments></TargetDllArguments>
+          <TargetDllArguments> -MPU</TargetDllArguments>
           <TargetDlgDll>TCM.DLL</TargetDlgDll>
-          <TargetDlgDllArguments>-pCM3</TargetDlgDllArguments>
+          <TargetDlgDllArguments>-pCM4</TargetDlgDllArguments>
         </DllOption>
         <DebugOption>
           <OPTHX>
@@ -134,10 +134,10 @@
             <RunIndependent>0</RunIndependent>
             <UpdateFlashBeforeDebugging>1</UpdateFlashBeforeDebugging>
             <Capability>1</Capability>
-            <DriverSelection>4099</DriverSelection>
+            <DriverSelection>4096</DriverSelection>
           </Flash1>
           <bUseTDR>1</bUseTDR>
-          <Flash2>Segger\JL2CM3.dll</Flash2>
+          <Flash2>BIN\UL2CM3.DLL</Flash2>
           <Flash3>"" ()</Flash3>
           <Flash4></Flash4>
           <pFcarmOut></pFcarmOut>
@@ -183,7 +183,7 @@
             <hadIRAM>1</hadIRAM>
             <hadXRAM>0</hadXRAM>
             <uocXRam>0</uocXRam>
-            <RvdsVP>0</RvdsVP>
+            <RvdsVP>2</RvdsVP>
             <RvdsMve>0</RvdsMve>
             <RvdsCdeCp>0</RvdsCdeCp>
             <nBranchProt>0</nBranchProt>
@@ -340,7 +340,7 @@
               <MiscControls></MiscControls>
               <Define>USE_STDPERIPH_DRIVER,GD32F30X_HD</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\Firmware\CMSIS;..\..\Firmware\CMSIS\GD\GD32F30x\Include;..\..\Firmware\GD32F30x_standard_peripheral\Include;..\..\Utilities;..\..\Template;..\Application;..\..\Utilities\LCD_Commom</IncludePath>
+              <IncludePath>..\..\Firmware\CMSIS;..\..\Firmware\CMSIS\GD\GD32F30x\Include;..\..\Firmware\GD32F30x_standard_peripheral\Include;..\..\Utilities;..\..\Template;..\..\Utilities\LCD_Commom;..\Application;..\Application\Chip;..\Application\Core;..\Application\Driver;..\FreeRtos\Inc;..\FreeRtos\Port;..\FreeRtos\Src</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -385,64 +385,89 @@
           <GroupName>Application</GroupName>
           <Files>
             <File>
-              <FileName>gd32f30x_it.c</FileName>
+              <FileName>main.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\gd32f30x_it.c</FilePath>
+              <FilePath>..\Application\main.c</FilePath>
             </File>
-            <File>
-              <FileName>systick.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\systick.c</FilePath>
-            </File>
-            <File>
-              <FileName>dev_iic.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Application\dev_iic.c</FilePath>
-            </File>
-            <File>
-              <FileName>TCA9548.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Application\TCA9548.c</FilePath>
-            </File>
-            <File>
-              <FileName>pannel.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Application\pannel.c</FilePath>
-            </File>
-            <File>
-              <FileName>TCA6408.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Application\TCA6408.c</FilePath>
-            </File>
-            <File>
-              <FileName>oled.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Application\oled.c</FilePath>
-            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Application/Chip</GroupName>
+          <Files>
             <File>
               <FileName>eeprom.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Application\eeprom.c</FilePath>
+              <FilePath>..\Application\Chip\eeprom.c</FilePath>
             </File>
             <File>
               <FileName>lt7911.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Application\lt7911.c</FilePath>
+              <FilePath>..\Application\Chip\lt7911.c</FilePath>
+            </File>
+            <File>
+              <FileName>oled.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Application\Chip\oled.c</FilePath>
+            </File>
+            <File>
+              <FileName>pannel.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Application\Chip\pannel.c</FilePath>
             </File>
             <File>
               <FileName>PCA9544.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Application\PCA9544.c</FilePath>
-            </File>
-            <File>
-              <FileName>main.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\main.c</FilePath>
+              <FilePath>..\Application\Chip\PCA9544.c</FilePath>
             </File>
             <File>
               <FileName>sabre9018.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Application\sabre9018.c</FilePath>
+              <FilePath>..\Application\Chip\sabre9018.c</FilePath>
+            </File>
+            <File>
+              <FileName>TCA6408.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Application\Chip\TCA6408.c</FilePath>
+            </File>
+            <File>
+              <FileName>TCA9548.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Application\Chip\TCA9548.c</FilePath>
+            </File>
+            <File>
+              <FileName>dev_key_led.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Application\Chip\dev_key_led.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Application/Core</GroupName>
+          <Files>
+            <File>
+              <FileName>gd32f30x_it.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Application\Core\gd32f30x_it.c</FilePath>
+            </File>
+            <File>
+              <FileName>FreeRTOSConfig.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\FreeRtos\Inc\FreeRTOSConfig.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Application/Driver</GroupName>
+          <Files>
+            <File>
+              <FileName>dev_iic.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Application\Driver\dev_iic.c</FilePath>
+            </File>
+            <File>
+              <FileName>systick.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Application\Driver\systick.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -694,6 +719,61 @@
               <FileName>readme.txt</FileName>
               <FileType>5</FileType>
               <FilePath>..\readme.txt</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>FreeRtos/Src</GroupName>
+          <Files>
+            <File>
+              <FileName>croutine.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FreeRtos\Src\croutine.c</FilePath>
+            </File>
+            <File>
+              <FileName>event_groups.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FreeRtos\Src\event_groups.c</FilePath>
+            </File>
+            <File>
+              <FileName>list.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FreeRtos\Src\list.c</FilePath>
+            </File>
+            <File>
+              <FileName>queue.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FreeRtos\Src\queue.c</FilePath>
+            </File>
+            <File>
+              <FileName>stream_buffer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FreeRtos\Src\stream_buffer.c</FilePath>
+            </File>
+            <File>
+              <FileName>tasks.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FreeRtos\Src\tasks.c</FilePath>
+            </File>
+            <File>
+              <FileName>timers.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FreeRtos\Src\timers.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>FreeRtos/Port</GroupName>
+          <Files>
+            <File>
+              <FileName>port.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FreeRtos\Port\port.c</FilePath>
+            </File>
+            <File>
+              <FileName>heap_4.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FreeRtos\Port\heap_4.c</FilePath>
             </File>
           </Files>
         </Group>

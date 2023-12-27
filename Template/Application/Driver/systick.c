@@ -2,10 +2,10 @@
     \file    systick.c
     \brief   the systick configuration file
 
-    \version 2017-02-10, V1.0.0, firmware for GD32F30x
-    \version 2018-10-10, V1.1.0, firmware for GD32F30x
-    \version 2018-12-25, V2.0.0, firmware for GD32F30x
-    \version 2020-09-30, V2.1.0, firmware for GD32F30x 
+    \version 2014-12-26, V1.0.0, firmware for GD32F10x
+    \version 2017-06-20, V2.0.0, firmware for GD32F10x
+    \version 2018-07-31, V2.1.0, firmware for GD32F10x
+    \version 2020-09-30, V2.2.0, firmware for GD32F10x
 */
 
 /*
@@ -64,25 +64,52 @@ void systick_config(void)
     \param[out] none
     \retval     none
 */
-void delay_1ms(uint32_t count)
+void delay_1us(uint32_t nus)
 {
-    uint32_t ctl;
-    
-    /* reload the count value */
-    SysTick->LOAD = (uint32_t)(count * 15000);
-    /* clear the current count value */
-    SysTick->VAL = 0x0000U;
-    /* enable the systick timer */
-    SysTick->CTRL = SysTick_CTRL_ENABLE_Msk;
-    /* wait for the COUNTFLAG flag set */
-    do{
-        ctl = SysTick->CTRL;
-    }while((ctl&SysTick_CTRL_ENABLE_Msk)&&!(ctl & SysTick_CTRL_COUNTFLAG_Msk));
-    /* disable the systick timer */
-    SysTick->CTRL &= ~SysTick_CTRL_ENABLE_Msk;
-    /* clear the current count value */
-    SysTick->VAL = 0x0000U;
+
+       uint32_t ticks;
+       uint32_t told,tnow,reload,tcnt=0;
+       if((0x0001&(SysTick->CTRL)) ==0)    //定时器未工作
+              vPortSetupTimerInterrupt();  //初始化定时器
+ 
+       reload = SysTick->LOAD;                     //获取重装载寄存器值
+       ticks = nus * (SystemCoreClock / 1000000);  //计数时间值
+       told=SysTick->VAL;                          //获取当前数值寄存器值（开始时数值）
+ 
+       while(1)
+       {
+              tnow=SysTick->VAL;          //获取当前数值寄存器值
+              if(tnow!=told)              //当前值不等于开始值说明已在计数
+              {         
+ 
+                     if(tnow<told)             //当前值小于开始数值，说明未计到0
+                          tcnt+=told-tnow;     //计数值=开始值-当前值
+ 
+                     else                  //当前值大于开始数值，说明已计到0并重新计数
+                            tcnt+=reload-tnow+told;   //计数值=重装载值-当前值+开始值  （已
+                                                      //从开始值计到0） 
+ 
+                     told=tnow;                //更新开始值
+                     if(tcnt>=ticks)break;     //时间超过/等于要延迟的时间,则退出.
+              } 
+       }    
 }
+
+void delay_1ms(uint32_t mus)
+{
+	for(int i; i<mus ; i++)
+	{
+		delay_1us(1000);
+	}
+}
+
+//void delay_1ms(uint32_t count)
+//{
+//    delay = count;
+//		
+//    while(0U != delay){
+//    }
+//}
 
 /*!
     \brief      delay decrement
