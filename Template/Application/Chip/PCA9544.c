@@ -37,7 +37,7 @@ int pca9544_i2c_set(enum PCA9544Channel channel)
 			printf("\r\n %s, %d: [ERROR] Write PCA9544 Failed ret = %d", __FUNCTION__, __LINE__, ret);
 			return -1;
 		}
-    printf("\r\n%s, %d: [DEBUG] get Read PCA9544 ret = %d,get buf = 0x%x", __FUNCTION__, __LINE__ , ret, get_buf[0]);
+//    printf("\r\n%s, %d: [DEBUG] get Read PCA9544 ret = %d,get buf = 0x%x", __FUNCTION__, __LINE__ , ret, get_buf[0]);
 		return ret;
 }
 int pca9544_i2c_init(void)
@@ -51,7 +51,7 @@ int pca9544_i2c_init(void)
 			printf("\r\n %s, %d: [ERROR] Write TCA9548 Failed ret = %d", __FUNCTION__, __LINE__, ret);
 			return -1;
 		}
-	printf("\r\n %s, %d: [DEBUG] get Write TCA9548 ret = %d,write buf = 0x%x", __FUNCTION__, __LINE__, ret, send_buf);
+//	printf("\r\n %s, %d: [DEBUG] get Write TCA9548 ret = %d,write buf = 0x%x", __FUNCTION__, __LINE__, ret, send_buf);
 }
 
 

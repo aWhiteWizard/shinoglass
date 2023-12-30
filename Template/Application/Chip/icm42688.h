@@ -10,6 +10,15 @@
 /*
 	ICM42688 at 1 channel of 9548
 */
+
+#define IMU_INT1_PIN						GPIO_PIN_9
+#define IMU_INT1_GPIO_PORT			GPIOA
+#define IMU_INT1_GPIO_RCU				RCU_GPIOA
+
+#define IMU_INT2_PIN						GPIO_PIN_10
+#define IMU_INT2_GPIO_PORT			GPIOA
+#define IMU_INT2_GPIO_RCU				RCU_GPIOA
+
 //
 #define ICM42688_IIC_ADDR  (0x68<<1)
 
@@ -124,15 +133,12 @@
 #define ICM42688_INTF_CONFIG6	0x7C
 
 #define ICM42688_BANK_2  			 0x02
-
 #define ICM42688_BANK_3  			 0x03
-
 #define ICM42688_BANK_4  			 0x04
-
 static unsigned char icm42688_init_cmd[128]=
 {
 	0x00, 	//ICM42688_DEVICE_CONFIG
-	0x28,	  //ICM42688_DRIVE_CONFIG
+	0x05,	  //ICM42688_DRIVE_CONFIG
 	0x00,		//ICM42688_INT_CONFIG
 	0x00, 	//ICM42688_FIFO_CONFIG
 	0x80,   //ICM42688_TEMP_DATA1
@@ -166,7 +172,7 @@ static unsigned char icm42688_init_cmd[128]=
 	0x00,		//ICM42688_SIGNAL_PATH_RESET
 	0x30,		//ICM42688_INTF_CONFIG0
 	0x91,		//ICM42688_INTF_CONFIG1
-	0x00,		//ICM42688_PWR_MGMT0
+	0x0F,		//ICM42688_PWR_MGMT0
 	0x06,		//ICM42688_GYRO_CONFIG0
 	0x06,		//ICM42688_ACCEL_CONFIG0
 	0x16,		//ICM42688_GYRO_CONFIG1
@@ -175,7 +181,7 @@ static unsigned char icm42688_init_cmd[128]=
 	0x23,		//ICM42688_TMST_CONFIG
 	0x82,		//ICM42688_APEX_CONFIG0
 	0x00,		//ICM42688_SMD_CONFIG
-	0x66,		//ICM42688_FIFO_CONFIG1
+	0x00,		//ICM42688_FIFO_CONFIG1
 	0x00, 	//ICM42688_FIFO_CONFIG2
 	0x00,		//ICM42688_FIFO_CONFIG3
 	0x10,		//ICM42688_FSYNC_CONFIG
@@ -193,6 +199,8 @@ static unsigned char icm42688_init_cmd[128]=
 };
 
 void icm42688_init(void);
+int icm42688_print(unsigned char reg);
+void icm42688_print_test(void);
 unsigned char icm42688_get_acc(unsigned char *read_acc);
 unsigned char icm42688_get_gyro(unsigned char *read_gyro);
 unsigned char icm42688_get_temp(unsigned char *read_temp);

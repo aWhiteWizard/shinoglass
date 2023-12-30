@@ -50,6 +50,8 @@ OF SUCH DAMAGE.
 #include "dev_key_led.h"
 #include "icm42688.h"
 
+float  gyro_dps = 0.010986328125;
+float  acc_dps = 0.00030517578125;
 extern int earphone_volume;
 extern int earphone_volume_reg;
 extern int oled_bright;
@@ -103,29 +105,47 @@ void icm42688_data_task(void * pvParameters)
 	unsigned char acc[6];
 	unsigned char gyro[6];
 	unsigned char temp[2];
-	int AccX,AccY,AccZ;
-	int GyroX,GyroY,GyroZ;
-	int Temp;
+	float AccX,AccY,AccZ;
+	float GyroX,GyroY,GyroZ;
+	float Temp;
 
 	while(1)
 	{
+//		icm42688_print_test();
 		icm42688_get_acc(acc);
 		icm42688_get_gyro(gyro);
 		icm42688_get_temp(temp);
-		AccX = (0x00FF & acc[0]) + ((0x00FF & acc[1]) << 8);
-		AccY = (0x00FF & acc[2]) + ((0x00FF & acc[3]) << 8);
-		AccZ = (0x00FF & acc[4]) + ((0x00FF & acc[5]) << 8);
+		if((acc[1] & 0x80) == 0x80)
+			acc[1] -= 0x80;
+		if((acc[3] & 0x80) == 0x80)
+			acc[3] -= 0x80;
+		if((acc[5] & 0x80) == 0x80)
+			acc[5] -= 0x80;
 
-		GyroX = (0x00FF & gyro[0]) + ((0x00FF & gyro[1]) << 8);
-		GyroY = (0x00FF & gyro[2]) + ((0x00FF & gyro[3]) << 8);
-		GyroZ = (0x00FF & gyro[4]) + ((0x00FF & gyro[5]) << 8);
+		if((gyro[1] & 0x80) == 0x80)
+			gyro[1] -= 0x80;
+		if((gyro[3] & 0x80) == 0x80)
+			gyro[3] -= 0x80;
+		if((gyro[5] & 0x80) == 0x80)
+			gyro[5] -= 0x80;
 		
-		Temp = (0x00FF & temp[0]) + ((0x00FF & temp[1]) << 8);
+		if((temp[1] & 0x80) == 0x80)
+			temp[1] -= 0x80;
+				
+		AccX = (float)((0x00FF & acc[0]) + ((0x00FF & acc[1]) << 8)) * acc_dps;
+		AccY = (float)((0x00FF & acc[2]) + ((0x00FF & acc[3]) << 8)) * acc_dps;
+		AccZ = (float)((0x00FF & acc[4]) + ((0x00FF & acc[5]) << 8)) * acc_dps;
+
+		GyroX = (float)((0x00FF & gyro[0]) + ((0x00FF & gyro[1]) << 8)) * gyro_dps;
+		GyroY = (float)((0x00FF & gyro[2]) + ((0x00FF & gyro[3]) << 8)) * gyro_dps;
+		GyroZ = (float)((0x00FF & gyro[4]) + ((0x00FF & gyro[5]) << 8)) * gyro_dps;
 		
-		printf("\r\n%s, %d: [DEBUG] AccX : %d. GyroX : %d. ", __FUNCTION__, __LINE__, AccX, GyroX);
-		printf("\r\n%s, %d: [DEBUG] AccY : %d. GyroY : %d. ", __FUNCTION__, __LINE__, AccY, GyroY);
-		printf("\r\n%s, %d: [DEBUG] AccZ : %d. GyroZ : %d. ", __FUNCTION__, __LINE__, AccZ, GyroZ);
-		printf("\r\n%s, %d: [DEBUG] Temp : %d. ", __FUNCTION__, __LINE__,Temp);
+		Temp = (float)((0x00FF & temp[0]) + ((0x00FF & temp[1]) << 8)) / 132.48 + 25;
+		
+		printf("\r\n%s, %d: [DEBUG] AccX : %f. GyroX : %f. ", __FUNCTION__, __LINE__, AccX, GyroX);
+		printf("\r\n%s, %d: [DEBUG] AccY : %f. GyroY : %f. ", __FUNCTION__, __LINE__, AccY, GyroY);
+		printf("\r\n%s, %d: [DEBUG] AccZ : %f. GyroZ : %f. ", __FUNCTION__, __LINE__, AccZ, GyroZ);
+		printf("\r\n%s, %d: [DEBUG] Temp : %f. ", __FUNCTION__, __LINE__,Temp);
 
 		vTaskDelay(500);
 	}

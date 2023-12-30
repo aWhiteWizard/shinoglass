@@ -52,7 +52,7 @@ int tca6408_write(unsigned char send_data, unsigned char reg_addr)
 				printf("\r\n%s, %d [ERROR] Write TCA6408 data is Failed! get callback is 0x%x.", __FUNCTION__, __LINE__ ,buf[0]);
 				return -1;
 		}
-		printf("\r\n%s %d: [DEBUG] get Read TCA6408 ret = %d,get buf = 0x%x" , __FUNCTION__ , __LINE__, ret, buf[0]);
+//		printf("\r\n%s %d: [DEBUG] get Read TCA6408 ret = %d,get buf = 0x%x" , __FUNCTION__ , __LINE__, ret, buf[0]);
 		return 0;
 }
 
