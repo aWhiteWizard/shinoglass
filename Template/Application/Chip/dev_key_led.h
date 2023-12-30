@@ -9,7 +9,7 @@
 #define KEY_UP_GPIO_PORT			GPIOB
 #define KEY_UP_GPIO_RCU				RCU_GPIOB
 
-#define KEY_DOWN_PIN						GPIO_PIN_13
+#define KEY_DOWN_PIN						GPIO_PIN_15
 #define KEY_DOWN_GPIO_PORT			GPIOB
 #define KEY_DOWN_GPIO_RCU				RCU_GPIOB
 
@@ -17,7 +17,7 @@
 #define KEY_LEFT_GPIO_PORT			GPIOB
 #define KEY_LEFT_GPIO_RCU				RCU_GPIOB
 
-#define KEY_RIGNT_PIN						GPIO_PIN_15
+#define KEY_RIGNT_PIN						GPIO_PIN_13
 #define KEY_RIGNT_GPIO_PORT			GPIOB
 #define KEY_RIGNT_GPIO_RCU				RCU_GPIOB
 
@@ -33,3 +33,4 @@ static int oled_bright_reg=0;
 void Key_Init(void);
 uint8_t Key_GPIO_Read(uint8_t keyNum);
 #endif
+

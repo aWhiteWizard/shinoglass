@@ -48,6 +48,7 @@ OF SUCH DAMAGE.
 #include "PCA9544.h"
 #include "sabre9018.h"
 #include "dev_key_led.h"
+#include "icm42688.h"
 
 extern int earphone_volume;
 extern int earphone_volume_reg;
@@ -57,12 +58,14 @@ extern int oled_bright_reg;
 SemaphoreHandle_t xBinarySemaphore;
 QueueHandle_t xQueue;
 
+TaskHandle_t icm42688Task_Handle;
 TaskHandle_t KeyValueTask_Handle;
 TaskHandle_t LogPrintTask_Handle;
 TaskHandle_t USARTCMDTask_Handle;
 
 #define KeyValue_PRIO (tskIDLE_PRIORITY + 2)
 #define LogPrint_PRIO (tskIDLE_PRIORITY + 2)
+#define icm42688_PRIO (tskIDLE_PRIORITY + 2)
 #define UsartCmd_PRIO (tskIDLE_PRIORITY + 1)
 /*!
     \brief      main init
@@ -95,6 +98,39 @@ void USART_cmd_task(void * pvParameters)
 	}
 }
 
+void icm42688_data_task(void * pvParameters)
+{
+	unsigned char acc[6];
+	unsigned char gyro[6];
+	unsigned char temp[2];
+	int AccX,AccY,AccZ;
+	int GyroX,GyroY,GyroZ;
+	int Temp;
+
+	while(1)
+	{
+		icm42688_get_acc(acc);
+		icm42688_get_gyro(gyro);
+		icm42688_get_temp(temp);
+		AccX = (0x00FF & acc[0]) + ((0x00FF & acc[1]) << 8);
+		AccY = (0x00FF & acc[2]) + ((0x00FF & acc[3]) << 8);
+		AccZ = (0x00FF & acc[4]) + ((0x00FF & acc[5]) << 8);
+
+		GyroX = (0x00FF & gyro[0]) + ((0x00FF & gyro[1]) << 8);
+		GyroY = (0x00FF & gyro[2]) + ((0x00FF & gyro[3]) << 8);
+		GyroZ = (0x00FF & gyro[4]) + ((0x00FF & gyro[5]) << 8);
+		
+		Temp = (0x00FF & temp[0]) + ((0x00FF & temp[1]) << 8);
+		
+		printf("\r\n%s, %d: [DEBUG] AccX : %d. GyroX : %d. ", __FUNCTION__, __LINE__, AccX, GyroX);
+		printf("\r\n%s, %d: [DEBUG] AccY : %d. GyroY : %d. ", __FUNCTION__, __LINE__, AccY, GyroY);
+		printf("\r\n%s, %d: [DEBUG] AccZ : %d. GyroZ : %d. ", __FUNCTION__, __LINE__, AccZ, GyroZ);
+		printf("\r\n%s, %d: [DEBUG] Temp : %d. ", __FUNCTION__, __LINE__,Temp);
+
+		vTaskDelay(500);
+	}
+}
+
 void KeyValue_set_task(void * pvParameters)
 {
 	while(1)
@@ -105,20 +141,59 @@ void KeyValue_set_task(void * pvParameters)
 					sabre9018_volume_set(earphone_volume_reg);
 					printf("\r\n earphone_volume value = %d", earphone_volume_reg);
 			}
-			vTaskDelay(200);
-	}
-}
-
-void Log_print_task(void * pvParameters)
-{	
-	while(1)
-	{
 			if(oled_bright_reg != oled_bright*10)
 			{	
 					oled_bright_reg = oled_bright*10;
 					set_bright(OLED_0, oled_bright_reg);
 					set_bright(OLED_1, oled_bright_reg);
 					printf("\r\n oled_bright value = %d", oled_bright_reg);
+			}
+			vTaskDelay(200);
+	}
+}
+
+void Log_print_task(void * pvParameters)
+{	
+	unsigned char value = 0;
+	while(1)
+	{
+			value = Key_GPIO_Read(0);
+			if(value == 0)
+			{
+				earphone_volume++;
+				if(earphone_volume > 100)
+					earphone_volume = 100;
+			}
+			value = Key_GPIO_Read(1);
+			if(value == 0)
+			{
+				earphone_volume--;
+				if(earphone_volume < 0)
+					earphone_volume = 0;
+			}
+			value = Key_GPIO_Read(2);
+			if(value == 0)
+			{
+				oled_bright--;
+				if(oled_bright < 0)
+					oled_bright = 0;
+			}		
+			value = Key_GPIO_Read(3);
+			if(value == 0)
+			{
+				oled_bright++;
+				if(oled_bright > 100)
+					oled_bright = 102;
+			}
+			value = Key_GPIO_Read(4);
+			if(value == 0)
+			{
+				vTaskDelay(2);
+				value = Key_GPIO_Read(4);
+				if(value == 0)
+				{
+					GPIO_2d3d_SW_set();	
+				}	
 			}
 			vTaskDelay(100);
 	}
@@ -142,6 +217,8 @@ void system_init(void)
     tca9548_i2c_set(TCA9548_ALL_DISABLE);
     pca9544_i2c_init();
 		sabre9018_init();
+		icm42688_init();
+		Key_Init();
 }
 
 /*!
@@ -160,6 +237,7 @@ int main(void)
 				xTaskCreate(KeyValue_set_task, "KeyValue_task", configMINIMAL_STACK_SIZE, NULL, KeyValue_PRIO,(TaskHandle_t *)KeyValueTask_Handle);
 				xTaskCreate(Log_print_task, "LogPrint_task", configMINIMAL_STACK_SIZE, NULL, LogPrint_PRIO,(TaskHandle_t *)LogPrintTask_Handle);
 				xTaskCreate(USART_cmd_task, "LogPrint_task", configMINIMAL_STACK_SIZE, NULL, UsartCmd_PRIO,(TaskHandle_t *)USARTCMDTask_Handle);
+				xTaskCreate(icm42688_data_task, "icm42688_task", configMINIMAL_STACK_SIZE, NULL, icm42688_PRIO,(TaskHandle_t *)icm42688Task_Handle);
 			
 				vTaskStartScheduler();
 		}
@@ -189,3 +267,4 @@ int fgetc(FILE *f)
 
 		return (int)usart_data_receive(EVAL_COM2);
 }
+

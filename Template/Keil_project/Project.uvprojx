@@ -415,14 +415,14 @@
               <FilePath>..\Application\Chip\pannel.c</FilePath>
             </File>
             <File>
-              <FileName>PCA9544.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Application\Chip\PCA9544.c</FilePath>
-            </File>
-            <File>
               <FileName>sabre9018.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Application\Chip\sabre9018.c</FilePath>
+            </File>
+            <File>
+              <FileName>PCA9544.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Application\Chip\PCA9544.c</FilePath>
             </File>
             <File>
               <FileName>TCA6408.c</FileName>
@@ -438,6 +438,11 @@
               <FileName>dev_key_led.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Application\Chip\dev_key_led.c</FilePath>
+            </File>
+            <File>
+              <FileName>icm42688.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Application\Chip\icm42688.c</FilePath>
             </File>
           </Files>
         </Group>

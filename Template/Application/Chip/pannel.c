@@ -14,6 +14,18 @@ void GPIO_rst_Init(void)
 		tca6408_write(init_config, TCA6408_OUTPUT);
 }
 
+void GPIO_2d3d_SW_set(void)
+{
+		unsigned char init_config = TCA6408_LV7911_GPIO_14;
+		unsigned char read_sw;
+		tca6408_read(&read_sw, TCA6408_OUTPUT);
+		if((read_sw & TCA6408_LV7911_GPIO_14) == TCA6408_LV7911_GPIO_14)
+				read_sw -= TCA6408_LV7911_GPIO_14;
+		else 
+				read_sw += TCA6408_LV7911_GPIO_14;
+	  tca6408_write(read_sw, TCA6408_OUTPUT); 
+				printf("\r\n [DEBUG] TCA6408_OUT setvalue = 0x%x", read_sw);
+}
 
 void pannel_reset(void)
 {   

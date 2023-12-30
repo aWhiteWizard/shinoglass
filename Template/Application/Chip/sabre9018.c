@@ -1,7 +1,4 @@
 #include "sabre9018.h"
-/*
-*	@brife sabre9018 init
-*/
 
 #define Delay_ms(time) vTaskDelay(time)
 int sabre9018_print(unsigned char reg)
@@ -10,6 +7,9 @@ int sabre9018_print(unsigned char reg)
 		DEV_I2C_Read(SABRE9018_IIC_BUS, (unsigned char)SABRE9018_IIC_ADDR, reg, 1,&sabre_status, 1);
 	    printf("\r\n%s, %d: [DEBUG] 0x%x : 0x%x", __FUNCTION__, __LINE__, reg, sabre_status);
 }
+/*
+*	@brife sabre9018 init
+*/
 
 int sabre9018_init(void)
 {

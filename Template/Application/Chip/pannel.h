@@ -40,6 +40,7 @@ void GPIO_rst_Init(void);
 void pannel_reset(void);
 void pannel_display(void);
 void set_bright(enum OLED_NUM oled_num, uint16_t bright);
+void GPIO_2d3d_SW_set(void);
 
 void pannel_config_303(void);
 void pannel_init(void);
