@@ -1,15 +1,13 @@
 /*!
-    \file    main.h
-    \brief   the header file of main 
+    \file    usbd_hw.h
+    \brief   usb hardware configuration file
 
-    \version 2017-02-10, V1.0.0, firmware for GD32F30x
-    \version 2018-10-10, V1.1.0, firmware for GD32F30x
-    \version 2018-12-25, V2.0.0, firmware for GD32F30x
-    \version 2020-09-30, V2.1.0, firmware for GD32F30x 
+    \version 2020-08-01, V3.0.0, firmware for GD32F30x
+    \version 2022-06-10, V3.1.0, firmware for GD32F30x
 */
 
 /*
-    Copyright (c) 2020, GigaDevice Semiconductor Inc.
+    Copyright (c) 2022, GigaDevice Semiconductor Inc.
 
     Redistribution and use in source and binary forms, with or without modification, 
 are permitted provided that the following conditions are met:
@@ -35,21 +33,17 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
 OF SUCH DAMAGE.
 */
 
-#ifndef MAIN_H
-#define MAIN_H
-/*ROTS Handfiles*/
-#include "FreeRTOS.h"
-#include "task.h"
-#include "queue.h"
-#include "semphr.h"
-#include "event_groups.h"
-#include "systick.h"
-#include "cdc_acm_core.h"
-#include "usbd_hw.h"
+#ifndef __USBD_HW_H
+#define __USBD_HW_H
 
+#include "usbd_conf.h"
 
-void KeyValue_set_task(void * pvParameters);
-void Log_print_task(void * pvParameters);
-void USART_cmd_task(void * pvParameters);
+/* function declarations */
+/* configure rcu clock */
+void rcu_config(void);
+/* configure gpio */
+void gpio_config(void);
+/* configure nvic */
+void nvic_config(void);
 
-#endif /* MAIN_H */
+#endif /* __USBD_HW_H */

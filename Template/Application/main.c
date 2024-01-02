@@ -49,6 +49,8 @@ OF SUCH DAMAGE.
 #include "sabre9018.h"
 #include "dev_key_led.h"
 #include "icm42688.h"
+#include "lt7911.h"
+
 
 float  gyro_dps = 0.010986328125;
 float  acc_dps = 0.00030517578125;
@@ -57,6 +59,8 @@ extern int earphone_volume_reg;
 extern int oled_bright;
 extern int oled_bright_reg;
 
+usb_dev usbd_cdc;
+
 SemaphoreHandle_t xBinarySemaphore;
 QueueHandle_t xQueue;
 
@@ -64,7 +68,9 @@ TaskHandle_t icm42688Task_Handle;
 TaskHandle_t KeyValueTask_Handle;
 TaskHandle_t LogPrintTask_Handle;
 TaskHandle_t USARTCMDTask_Handle;
+TaskHandle_t LT7911UpgradeTask_Handle;
 
+#define Lt7911Upgrade_PRIO (tskIDLE_PRIORITY + 2)
 #define KeyValue_PRIO (tskIDLE_PRIORITY + 2)
 #define LogPrint_PRIO (tskIDLE_PRIORITY + 2)
 #define icm42688_PRIO (tskIDLE_PRIORITY + 2)
@@ -75,6 +81,31 @@ TaskHandle_t USARTCMDTask_Handle;
     \param[out] none
     \retval     none
 */
+
+void Lt7911Upgrade_task(void * pvParameters)
+{
+	//1¡¢get upgrade single from USB 
+	
+	//2¡¢get hex from USB 
+	
+	//3¡¢send hex to Pannel
+	while(1)
+	{
+			int ret;
+//		ret = cdc_acm_check_ready(&usbd_cdc);
+			if (0U == cdc_acm_check_ready(&usbd_cdc)) {
+					cdc_acm_data_receive(&usbd_cdc);
+					printf("\r\n[DEBUG] cdc_acm_check_ready == 0");
+			} else {
+					cdc_acm_data_send(&usbd_cdc);
+					printf("\r\n[DEBUG] cdc_acm_check_ready != 0");
+
+			}
+	vTaskDelay(700);
+	}
+
+
+}
 
 void USART_cmd_task(void * pvParameters)
 {
@@ -91,7 +122,7 @@ void USART_cmd_task(void * pvParameters)
 			sabre9018_print(SABRE9018_REG_CHIPSTATUS);	
 			sabre9018_print(SABRE9018_REG_READONLY);	
 		}
-		
+
 		if(receive_buf[0] == 0x08)
 				earphone_volume = receive_buf[1];
 		if(receive_buf[0] == 0x0F)
@@ -155,15 +186,15 @@ void KeyValue_set_task(void * pvParameters)
 {
 	while(1)
 	{
-			if(earphone_volume != earphone_volume_reg)
+			if(earphone_volume_reg != earphone_volume*10)
 			{	
-					earphone_volume_reg = earphone_volume;
+					earphone_volume_reg = earphone_volume*10;
 					sabre9018_volume_set(earphone_volume_reg);
 					printf("\r\n earphone_volume value = %d", earphone_volume_reg);
 			}
-			if(oled_bright_reg != oled_bright*10)
+			if(oled_bright_reg != oled_bright*100)
 			{	
-					oled_bright_reg = oled_bright*10;
+					oled_bright_reg = oled_bright*100;
 					set_bright(OLED_0, oled_bright_reg);
 					set_bright(OLED_1, oled_bright_reg);
 					printf("\r\n oled_bright value = %d", oled_bright_reg);
@@ -181,8 +212,8 @@ void Log_print_task(void * pvParameters)
 			if(value == 0)
 			{
 				earphone_volume++;
-				if(earphone_volume > 100)
-					earphone_volume = 100;
+				if(earphone_volume > 10)
+					earphone_volume = 10;
 			}
 			value = Key_GPIO_Read(1);
 			if(value == 0)
@@ -202,8 +233,8 @@ void Log_print_task(void * pvParameters)
 			if(value == 0)
 			{
 				oled_bright++;
-				if(oled_bright > 100)
-					oled_bright = 102;
+				if(oled_bright > 10)
+					oled_bright = 10;
 			}
 			value = Key_GPIO_Read(4);
 			if(value == 0)
@@ -231,6 +262,12 @@ void system_init(void)
 		GPIO_INIT();
     I2C_Init();
 //	
+		rcu_config();
+		gpio_config();
+		usbd_init(&usbd_cdc, &cdc_desc, &cdc_class);
+		nvic_config();
+    usbd_connect(&usbd_cdc);
+
     tca9548_i2c_init();
 		tca6408_i2c_init();
     pannel_init();  
@@ -256,8 +293,9 @@ int main(void)
 		{
 				xTaskCreate(KeyValue_set_task, "KeyValue_task", configMINIMAL_STACK_SIZE, NULL, KeyValue_PRIO,(TaskHandle_t *)KeyValueTask_Handle);
 				xTaskCreate(Log_print_task, "LogPrint_task", configMINIMAL_STACK_SIZE, NULL, LogPrint_PRIO,(TaskHandle_t *)LogPrintTask_Handle);
-				xTaskCreate(USART_cmd_task, "LogPrint_task", configMINIMAL_STACK_SIZE, NULL, UsartCmd_PRIO,(TaskHandle_t *)USARTCMDTask_Handle);
+				xTaskCreate(USART_cmd_task, "UsartCmd_task", configMINIMAL_STACK_SIZE, NULL, UsartCmd_PRIO,(TaskHandle_t *)USARTCMDTask_Handle);
 				xTaskCreate(icm42688_data_task, "icm42688_task", configMINIMAL_STACK_SIZE, NULL, icm42688_PRIO,(TaskHandle_t *)icm42688Task_Handle);
+				xTaskCreate(Lt7911Upgrade_task, "icm42688_task", configMINIMAL_STACK_SIZE, NULL, Lt7911Upgrade_PRIO,(TaskHandle_t *)LT7911UpgradeTask_Handle);
 			
 				vTaskStartScheduler();
 		}

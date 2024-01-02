@@ -49,3 +49,10 @@ int lt7911_read(unsigned char reg_addr, unsigned char *read_data, int len)
 		return 0;
 }
 
+/*
+*	@brife lt7911 Upgrade
+*/
+int	lt7911_upgrade(void)
+{
+	return 0;
+}

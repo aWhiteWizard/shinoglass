@@ -23,6 +23,7 @@
 
 
 int lt7911_init();
+int	lt7911_upgrade(void);
 int lt7911_write(unsigned char reg_addr, unsigned char send_data);
 int lt7911_read(unsigned char reg_addr, unsigned char *read_data, int len);
 

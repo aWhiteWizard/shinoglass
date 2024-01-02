@@ -3,9 +3,10 @@
 #define Delay_ms(time) vTaskDelay(time)
 int sabre9018_print(unsigned char reg)
 {
-			unsigned char sabre_status;
+		unsigned char sabre_status;
 		DEV_I2C_Read(SABRE9018_IIC_BUS, (unsigned char)SABRE9018_IIC_ADDR, reg, 1,&sabre_status, 1);
-	    printf("\r\n%s, %d: [DEBUG] 0x%x : 0x%x", __FUNCTION__, __LINE__, reg, sabre_status);
+		printf("\r\n%s, %d: [DEBUG] 0x%x : 0x%x", __FUNCTION__, __LINE__, reg, sabre_status);
+		return 0;
 }
 /*
 *	@brife sabre9018 init
@@ -55,22 +56,22 @@ int sabre9018_init(void)
 		DEV_I2C_Write(SABRE9018_IIC_BUS, (unsigned char)SABRE9018_IIC_ADDR, SABRE9018_REG_HEADPHONEAMPLIFERCTRL, 1, 															&sabre9018_init_reg[36], 1);
 		DEV_I2C_Write(SABRE9018_IIC_BUS, (unsigned char)SABRE9018_IIC_ADDR, SABRE9018_REG_SLIMBUSCTRL, 1, 																				&sabre9018_init_reg[37], 1);
 		delay_1ms(5);
-		sabre9018_print(SABRE9018_REG_SYSTEMSET);
-		sabre9018_print(SABRE9018_REG_INPUTCONFIG);
-		sabre9018_print(SABRE9018_REG_SOFTVOLUMECTRL_1);
-		sabre9018_print(SABRE9018_REG_SOFTVOLUMECTRL_2);
-		sabre9018_print(SABRE9018_REG_SOFTVOLUMECTRL_3);
-		sabre9018_print(SABRE9018_REG_MASTERMODECTRL);
-		sabre9018_print(SABRE9018_REG_CHANNELMAPPING);
-		sabre9018_print(SABRE9018_REG_VOLUME_1);
-		sabre9018_print(SABRE9018_REG_VOLUME_2);
-		sabre9018_print(SABRE9018_REG_CHIPSTATUS);	
-		sabre9018_print(SABRE9018_REG_READONLY);	
-		sabre9018_print(SABRE9018_REG_RIGHTCHANNEL_2ND_HARMONICCOMPENSATIONCOEFFICIENTS_0);
-		sabre9018_print(SABRE9018_REG_RIGHTCHANNEL_2ND_HARMONICCOMPENSATIONCOEFFICIENTS_1);
-		sabre9018_print(SABRE9018_REG_RIGHTCHANNEL_3RD_HARMONICCOMPENSATIONCOEFFICIENTS_0);
-		sabre9018_print(SABRE9018_REG_RIGHTCHANNEL_3RD_HARMONICCOMPENSATIONCOEFFICIENTS_1);
-		sabre9018_print(SABRE9018_REG_SEPARATETHDCOMPENSATION);
+//		sabre9018_print(SABRE9018_REG_SYSTEMSET);
+//		sabre9018_print(SABRE9018_REG_INPUTCONFIG);
+//		sabre9018_print(SABRE9018_REG_SOFTVOLUMECTRL_1);
+//		sabre9018_print(SABRE9018_REG_SOFTVOLUMECTRL_2);
+//		sabre9018_print(SABRE9018_REG_SOFTVOLUMECTRL_3);
+//		sabre9018_print(SABRE9018_REG_MASTERMODECTRL);
+//		sabre9018_print(SABRE9018_REG_CHANNELMAPPING);
+//		sabre9018_print(SABRE9018_REG_VOLUME_1);
+//		sabre9018_print(SABRE9018_REG_VOLUME_2);
+//		sabre9018_print(SABRE9018_REG_CHIPSTATUS);	
+//		sabre9018_print(SABRE9018_REG_READONLY);	
+//		sabre9018_print(SABRE9018_REG_RIGHTCHANNEL_2ND_HARMONICCOMPENSATIONCOEFFICIENTS_0);
+//		sabre9018_print(SABRE9018_REG_RIGHTCHANNEL_2ND_HARMONICCOMPENSATIONCOEFFICIENTS_1);
+//		sabre9018_print(SABRE9018_REG_RIGHTCHANNEL_3RD_HARMONICCOMPENSATIONCOEFFICIENTS_0);
+//		sabre9018_print(SABRE9018_REG_RIGHTCHANNEL_3RD_HARMONICCOMPENSATIONCOEFFICIENTS_1);
+//		sabre9018_print(SABRE9018_REG_SEPARATETHDCOMPENSATION);
 		
 		pca9544_i2c_set(PCA9544_CHANNEL_DISABLED);
     printf("\r\n%s, %d: [DEBUG] SABRE9018 Set done", __FUNCTION__, __LINE__);
@@ -87,6 +88,11 @@ int sabre9018_volume_set(unsigned char send_data)
 		int ret;
 		pca9544_i2c_set(SABRE9018_CHANNEL);
 		ret = DEV_I2C_Write(SABRE9018_IIC_BUS, (unsigned char)SABRE9018_IIC_ADDR, SABRE9018_REG_VOLUME_1, 1, &send_data, 1);
+		if(ret != 0)
+		{
+			printf("\r\n [ERROR] sabre9018 Write Error ,ret = %d,write = 0x%x", ret, send_data);
+			return -1;
+		}
 		ret = DEV_I2C_Write(SABRE9018_IIC_BUS, (unsigned char)SABRE9018_IIC_ADDR, SABRE9018_REG_VOLUME_2, 1, &send_data, 1);
 		if(ret != 0)
 		{
@@ -104,7 +110,7 @@ int sabre9018_volume_set(unsigned char send_data)
 * @param len length of Read Data
 */
 int sabre9018_read(unsigned char reg_addr, unsigned char *read_data, int len)
-{
+{	
 		int ret;
 		pca9544_i2c_set(SABRE9018_CHANNEL);
 

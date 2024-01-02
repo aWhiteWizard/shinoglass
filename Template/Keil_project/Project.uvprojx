@@ -340,7 +340,7 @@
               <MiscControls></MiscControls>
               <Define>USE_STDPERIPH_DRIVER,GD32F30X_HD</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\Firmware\CMSIS;..\..\Firmware\CMSIS\GD\GD32F30x\Include;..\..\Firmware\GD32F30x_standard_peripheral\Include;..\..\Utilities;..\..\Template;..\..\Utilities\LCD_Commom;..\Application;..\Application\Chip;..\Application\Core;..\Application\Driver;..\FreeRtos\Inc;..\FreeRtos\Port;..\FreeRtos\Src</IncludePath>
+              <IncludePath>..\..\Firmware\CMSIS;..\..\Firmware\CMSIS\GD\GD32F30x\Include;..\..\Firmware\GD32F30x_standard_peripheral\Include;..\..\Utilities;..\..\Template;..\..\Utilities\LCD_Commom;..\Application;..\Application\Chip;..\Application\Core;..\Application\Driver;..\FreeRtos\Inc;..\FreeRtos\Port;..\FreeRtos\Src;..\..\Firmware\GD32F30x_usbd_library\usbd\Include;..\..\Firmware\GD32F30x_usbd_library\device\Include;..\..\Firmware\GD32F30x_usbd_library\class\device\cdc\Include</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -458,6 +458,11 @@
               <FileName>FreeRTOSConfig.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\FreeRtos\Inc\FreeRTOSConfig.h</FilePath>
+            </File>
+            <File>
+              <FileName>gd32f30x_usbd_hw.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Application\Core\gd32f30x_usbd_hw.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -779,6 +784,56 @@
               <FileName>heap_4.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\FreeRtos\Port\heap_4.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>USB/USBD_Drivers</GroupName>
+          <Files>
+            <File>
+              <FileName>usbd_lld_int.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Firmware\GD32F30x_usbd_library\usbd\Source\usbd_lld_int.c</FilePath>
+            </File>
+            <File>
+              <FileName>usbd_lld_core.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Firmware\GD32F30x_usbd_library\usbd\Source\usbd_lld_core.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>USB/USBD_Device</GroupName>
+          <Files>
+            <File>
+              <FileName>usbd_core.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Firmware\GD32F30x_usbd_library\device\Source\usbd_core.c</FilePath>
+            </File>
+            <File>
+              <FileName>usbd_enum.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Firmware\GD32F30x_usbd_library\device\Source\usbd_enum.c</FilePath>
+            </File>
+            <File>
+              <FileName>usbd_pwr.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Firmware\GD32F30x_usbd_library\device\Source\usbd_pwr.c</FilePath>
+            </File>
+            <File>
+              <FileName>usbd_transc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Firmware\GD32F30x_usbd_library\device\Source\usbd_transc.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>USB/USBD_Class</GroupName>
+          <Files>
+            <File>
+              <FileName>cdc_acm_core.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Firmware\GD32F30x_usbd_library\class\device\cdc\Source\cdc_acm_core.c</FilePath>
             </File>
           </Files>
         </Group>

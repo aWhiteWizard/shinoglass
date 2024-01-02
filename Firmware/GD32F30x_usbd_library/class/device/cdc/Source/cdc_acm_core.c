@@ -35,6 +35,7 @@ OF SUCH DAMAGE.
 
 #include "usbd_transc.h"
 #include "cdc_acm_core.h"
+#include <stdio.h>
 
 #define USBD_VID                          0x28E9U
 #define USBD_PID                          0x018AU
@@ -289,6 +290,8 @@ void cdc_acm_data_receive(usb_dev *udev)
     cdc->pre_packet_send = 0U;
 
     usbd_ep_recev(udev, CDC_OUT_EP, (uint8_t*)(cdc->data), USB_CDC_RX_LEN);
+			printf("\r\n[DEBUG] %s, %d.", __FUNCTION__, __LINE__);
+
 }
 
 /*!
@@ -307,6 +310,7 @@ void cdc_acm_data_send (usb_dev *udev)
         usbd_ep_send(udev, CDC_IN_EP, (uint8_t*)(cdc->data), (uint16_t)data_len);
         cdc->receive_length = 0U;
     }
+
 }
 
 /*!
@@ -324,7 +328,6 @@ uint8_t cdc_acm_check_ready(usb_dev *udev)
             return 0U;
         }
     }
-
     return 5U;
 }
 
@@ -363,6 +366,7 @@ static uint8_t cdc_acm_init (usb_dev *udev, uint8_t config_index)
     };
 
     udev->class_data[CDC_COM_INTERFACE] = (void *)&cdc_handler;
+		printf("\r\n[DEBUG] %s, %d.", __FUNCTION__, __LINE__);
 
     return USBD_OK;
 }
@@ -382,6 +386,7 @@ static uint8_t cdc_acm_deinit (usb_dev *udev, uint8_t config_index)
 
     /* deinitialize the command endpoint */
     usbd_ep_deinit(udev, CDC_CMD_EP);
+		printf("\r\n[DEBUG] %s, %d.", __FUNCTION__, __LINE__);
 
     return USBD_OK;
 }
@@ -402,6 +407,7 @@ static uint8_t cdc_acm_ctlx_out (usb_dev *udev)
 
         udev->class_core->req_cmd = NO_CMD;
     }
+		printf("\r\n[DEBUG] %s, %d.", __FUNCTION__, __LINE__);
 
     return USBD_OK;
 }
@@ -424,6 +430,8 @@ static void cdc_acm_data_in (usb_dev *udev, uint8_t ep_num)
         cdc->packet_sent = 1U;
         cdc->pre_packet_send = 1U;
     }
+				printf("\r\n[DEBUG] %s, %d.", __FUNCTION__, __LINE__);
+
 }
 
 /*!
@@ -440,6 +448,9 @@ static void cdc_acm_data_out (usb_dev *udev, uint8_t ep_num)
     cdc->packet_receive = 1U;
 
     cdc->receive_length = udev->transc_out[ep_num].xfer_count;
+	
+			printf("\r\n[DEBUG] %s, %d.", __FUNCTION__, __LINE__);
+
 }
 
 /*!
@@ -505,6 +516,7 @@ static uint8_t cdc_acm_req_handler (usb_dev *udev, usb_req *req)
     default:
         break;
     }
+		printf("\r\n[DEBUG] %s, %d.", __FUNCTION__, __LINE__);
 
     return status;
 }

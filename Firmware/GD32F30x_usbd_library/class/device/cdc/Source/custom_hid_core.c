@@ -3,8 +3,8 @@
     \brief   custom HID class driver
 
     \version 2020-08-01, V3.0.0, firmware for GD32F30x
-    \version 2021-06-22, V3.0.1, firmware for GD32F30x
-    \version 2021-11-09, V3.0.2, firmware for GD32F30x
+    \version 2020-12-07, V3.0.1, firmware for GD32F30x
+    \version 2021-06-22, V3.0.2, firmware for GD32F30x
     \version 2022-06-10, V3.1.0, firmware for GD32F30x
 */
 
@@ -35,17 +35,16 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
 OF SUCH DAMAGE.
 */
 
-#include "usbd_transc.h"
 #include "custom_hid_core.h"
-#include "gd32f303e_eval.h"
+#include "usbd_enum.h"
 #include <string.h>
 
 #define USBD_VID                     0x28E9U
-#define USBD_PID                     0x128AU
+#define USBD_PID                     0x028AU
 
 /* Note:it should use the C99 standard when compiling the below codes */
 /* USB standard device descriptor */
-usb_desc_dev custom_hid_dev_desc =
+const usb_desc_dev custom_hid_dev_desc =
 {
     .header = 
      {
@@ -56,7 +55,7 @@ usb_desc_dev custom_hid_dev_desc =
     .bDeviceClass          = 0x00U,
     .bDeviceSubClass       = 0x00U,
     .bDeviceProtocol       = 0x00U,
-    .bMaxPacketSize0       = USBD_EP0_MAX_SIZE,
+    .bMaxPacketSize0       = USB_FS_EP0_MAX_LEN,
     .idVendor              = USBD_VID,
     .idProduct             = USBD_PID,
     .bcdDevice             = 0x0100U,
@@ -66,8 +65,8 @@ usb_desc_dev custom_hid_dev_desc =
     .bNumberConfigurations = USBD_CFG_MAX_NUM,
 };
 
-/* USB device configure descriptor */
-usb_hid_desc_config_set custom_hid_config_desc = 
+/* USB device configuration descriptor */
+const usb_hid_desc_config_set custom_hid_config_desc = 
 {
     .config = 
     {
@@ -142,18 +141,18 @@ usb_hid_desc_config_set custom_hid_config_desc =
 };
 
 /* USB language ID descriptor */
-static usb_desc_LANGID usbd_language_id_desc = 
+static const usb_desc_LANGID usbd_language_id_desc = 
 {
     .header = 
      {
-         .bLength = sizeof(usb_desc_LANGID), 
+         .bLength         = sizeof(usb_desc_LANGID), 
          .bDescriptorType = USB_DESCTYPE_STR
      },
     .wLANGID = ENG_LANGID
 };
 
 /* USB manufacture string */
-static usb_desc_str manufacturer_string = 
+static const usb_desc_str manufacturer_string = 
 {
     .header = 
      {
@@ -164,7 +163,7 @@ static usb_desc_str manufacturer_string =
 };
 
 /* USB product string */
-static usb_desc_str product_string = 
+static const usb_desc_str product_string = 
 {
     .header = 
      {
@@ -174,7 +173,7 @@ static usb_desc_str product_string =
     .unicode_string = {'G', 'D', '3', '2', '-', 'C', 'u', 's', 't', 'o', 'm', 'H', 'I', 'D'}
 };
 
-/* USB serial string */
+/* USBD serial string */
 static usb_desc_str serial_string = 
 {
     .header = 
@@ -185,7 +184,7 @@ static usb_desc_str serial_string =
 };
 
 /* USB string descriptor set */
-uint8_t* usbd_hid_strings[] = 
+void *const usbd_hid_strings[] = 
 {
     [STR_IDX_LANGID]  = (uint8_t *)&usbd_language_id_desc,
     [STR_IDX_MFC]     = (uint8_t *)&manufacturer_string,
@@ -193,28 +192,10 @@ uint8_t* usbd_hid_strings[] =
     [STR_IDX_SERIAL]  = (uint8_t *)&serial_string
 };
 
-usb_desc custom_hid_desc = 
-{
+usb_desc custom_hid_desc = {
     .dev_desc    = (uint8_t *)&custom_hid_dev_desc,
     .config_desc = (uint8_t *)&custom_hid_config_desc,
     .strings     = usbd_hid_strings
-};
-
-/* local function prototypes ('static') */
-static uint8_t custom_hid_init         (usb_dev *udev, uint8_t config_index);
-static uint8_t custom_hid_deinit       (usb_dev *udev, uint8_t config_index);
-static uint8_t custom_hid_req_handler  (usb_dev *udev, usb_req *req);
-static void custom_hid_data_in         (usb_dev *udev, uint8_t ep_num);
-static void custom_hid_data_out        (usb_dev *udev, uint8_t ep_num);
-
-usb_class custom_hid_class = {
-    .req_cmd       = 0xFFU,
-
-    .init          = custom_hid_init,
-    .deinit        = custom_hid_deinit,
-    .req_process   = custom_hid_req_handler,
-    .data_in       = custom_hid_data_in,
-    .data_out      = custom_hid_data_out
 };
 
 const uint8_t customhid_report_descriptor[DESC_LEN_REPORT] =
@@ -284,6 +265,27 @@ const uint8_t customhid_report_descriptor[DESC_LEN_REPORT] =
     0xc0            /* END_COLLECTION            */
 };
 
+/* local function prototypes ('static') */
+static uint8_t custom_hid_init        (usb_dev *udev, uint8_t config_index);
+static uint8_t custom_hid_deinit      (usb_dev *udev, uint8_t config_index);
+static uint8_t custom_hid_req_handler (usb_dev *udev, usb_req *req);
+static uint8_t custom_hid_data_in     (usb_dev *udev, uint8_t ep_num);
+static uint8_t custom_hid_data_out    (usb_dev *udev, uint8_t ep_num);
+
+usb_class_core usbd_custom_hid_cb = 
+{
+    .command   = NO_CMD,
+    .alter_set = 0U,
+
+    .init      = custom_hid_init,
+    .deinit    = custom_hid_deinit,
+
+    .req_proc  = custom_hid_req_handler,
+
+    .data_in   = custom_hid_data_in,
+    .data_out  = custom_hid_data_out
+};
+
 /*!
     \brief      register HID interface operation functions
     \param[in]  udev: pointer to USB device instance
@@ -294,7 +296,7 @@ const uint8_t customhid_report_descriptor[DESC_LEN_REPORT] =
 uint8_t custom_hid_itfop_register (usb_dev *udev, hid_fop_handler *hid_fop)
 {
     if (NULL != hid_fop) {
-        udev->user_data = hid_fop;
+        udev->dev.user_data = hid_fop;
 
         return USBD_OK;
     }
@@ -310,7 +312,7 @@ uint8_t custom_hid_itfop_register (usb_dev *udev, hid_fop_handler *hid_fop)
     \param[out] none
     \retval     USB device operation status
 */
-uint8_t custom_hid_report_send (usb_dev *udev, uint8_t *report, uint16_t len)
+uint8_t custom_hid_report_send (usb_dev *udev, uint8_t *report, uint32_t len)
 {
     usbd_ep_send (udev, CUSTOMHID_IN_EP, report, len);
 
@@ -328,23 +330,23 @@ static uint8_t custom_hid_init (usb_dev *udev, uint8_t config_index)
 {
     static custom_hid_handler hid_handler;
 
-    memset((void *)&hid_handler, 0, sizeof(custom_hid_handler));
+    memset((void *)&hid_handler, 0U, sizeof(custom_hid_handler));
 
-    /* initialize the data endpoints */
-    usbd_ep_init(udev, EP_BUF_SNG, HID_TX_ADDR, &(custom_hid_config_desc.hid_epin));
-    usbd_ep_init(udev, EP_BUF_SNG, HID_RX_ADDR, &(custom_hid_config_desc.hid_epout));
+    /* Initialize the data Tx endpoint */
+    usbd_ep_setup (udev, &(custom_hid_config_desc.hid_epin));
 
+    /* Initialize the data Rx endpoint */
+    usbd_ep_setup (udev, &(custom_hid_config_desc.hid_epout));
+
+    /* prepare receive data */
     usbd_ep_recev (udev, CUSTOMHID_OUT_EP, hid_handler.data, 2U);
 
-    udev->ep_transc[EP_ID(CUSTOMHID_IN_EP)][TRANSC_IN] = custom_hid_class.data_in;
-    udev->ep_transc[EP_ID(CUSTOMHID_OUT_EP)][TRANSC_OUT] = custom_hid_class.data_out;
+    udev->dev.class_data[CUSTOM_HID_INTERFACE] = (void *)&hid_handler;
 
-    udev->class_data[CUSTOM_HID_INTERFACE] = (void *)&hid_handler;
-
-    if (udev->user_data != NULL) {
+    if (udev->dev.user_data != NULL) {
         for (uint8_t i = 0U; i < MAX_PERIPH_NUM; i++) {
-            if (((hid_fop_handler *)udev->user_data)->periph_config[i] != NULL) {
-                ((hid_fop_handler *)udev->user_data)->periph_config[i]();
+            if (((hid_fop_handler *)udev->dev.user_data)->periph_config[i] != NULL) {
+                ((hid_fop_handler *)udev->dev.user_data)->periph_config[i]();
             }
         }
     }
@@ -362,8 +364,8 @@ static uint8_t custom_hid_init (usb_dev *udev, uint8_t config_index)
 static uint8_t custom_hid_deinit (usb_dev *udev, uint8_t config_index)
 {
     /* deinitialize HID endpoints */
-    usbd_ep_deinit(udev, CUSTOMHID_IN_EP);
-    usbd_ep_deinit(udev, CUSTOMHID_OUT_EP);
+    usbd_ep_clear(udev, CUSTOMHID_IN_EP);
+    usbd_ep_clear(udev, CUSTOMHID_OUT_EP);
 
     return USBD_OK;
 }
@@ -377,137 +379,112 @@ static uint8_t custom_hid_deinit (usb_dev *udev, uint8_t config_index)
 */
 static uint8_t custom_hid_req_handler (usb_dev *udev, usb_req *req)
 {
-    uint8_t status = REQ_NOTSUPP;
+    usb_transc *transc = &udev->dev.transc_in[0];
 
-    custom_hid_handler *hid = (custom_hid_handler *)udev->class_data[CUSTOM_HID_INTERFACE];
+    custom_hid_handler *hid = (custom_hid_handler *)udev->dev.class_data[CUSTOM_HID_INTERFACE];
 
     switch (req->bRequest) {
-    case USB_GET_DESCRIPTOR:
-        if (USB_DESCTYPE_REPORT == (req->wValue >> 8)) {
-            usb_transc_config(&udev->transc_in[0], 
-                              (uint8_t *)customhid_report_descriptor, 
-                              USB_MIN(DESC_LEN_REPORT, req->wLength), 
-                              0U);
-
-            status = REQ_SUPP;
-        } else if (USB_DESCTYPE_HID == (req->wValue >> 8U)) {
-            usb_transc_config(&udev->transc_in[0U], 
-                              (uint8_t *)(&(custom_hid_config_desc.hid_vendor)), 
-                              USB_MIN(9U, req->wLength), 
-                              0U);
-        }
-        break;
-
     case GET_REPORT:
-        if (2U == req->wLength) {
-            usb_transc_config(&udev->transc_in[0], hid->data, 2U, 0U);
-
-            status = REQ_SUPP;
-        }
         break;
 
     case GET_IDLE:
-        usb_transc_config(&udev->transc_in[0], (uint8_t *)&hid->idlestate, 1U, 0U);
-
-        status = REQ_SUPP;
+        transc->xfer_buf = (uint8_t *)&hid->idlestate;
+        transc->remain_len = 1U;
         break;
 
     case GET_PROTOCOL:
-        usb_transc_config(&udev->transc_in[0], (uint8_t *)&hid->protocol, 1U, 0U);
-
-        status = REQ_SUPP;
+        transc->xfer_buf = (uint8_t *)&hid->protocol;
+        transc->remain_len = 1U;
         break;
 
     case SET_REPORT:
         hid->reportID = (uint8_t)(req->wValue);
-
-        usb_transc_config(&udev->transc_out[0], hid->data, req->wLength, 0U);
-
-        status = REQ_SUPP;
         break;
 
     case SET_IDLE:
-        hid->idlestate = (uint8_t)(req->wValue >> 8);
-
-        status = REQ_SUPP;
+        hid->idlestate = (uint8_t)(req->wValue >> 8U);
         break;
 
     case SET_PROTOCOL:
         hid->protocol = (uint8_t)(req->wValue);
+        break;
 
-        status = REQ_SUPP;
+    case USB_GET_DESCRIPTOR:
+        if (USB_DESCTYPE_REPORT == (req->wValue >> 8U)) {
+            transc->remain_len = USB_MIN(DESC_LEN_REPORT, req->wLength);
+            transc->xfer_buf = (uint8_t *)customhid_report_descriptor;
+        }
         break;
 
     default:
-        break;
+        return USBD_FAIL;
     }
 
-    return status;
+    return USBD_OK;
 }
 
 /*!
-    \brief      handle custom HID data in transaction
+    \brief      handle custom HID data
     \param[in]  udev: pointer to USB device instance
-    \param[in]  ep_num: endpoint number
+    \param[in]  ep_num: endpoint identifier
     \param[out] none
-    \retval     none
+    \retval     USB device operation status
 */
-static void custom_hid_data_in (usb_dev *udev, uint8_t ep_num)
+static uint8_t custom_hid_data_in (usb_dev *udev, uint8_t ep_num)
 {
-    return;
+    return USBD_OK;
 }
 
 /*!
-    \brief      handle custom HID data out transaction
+    \brief      handle custom HID data
     \param[in]  udev: pointer to USB device instance
-    \param[in]  ep_num: endpoint number
+    \param[in]  ep_num: endpoint identifier
     \param[out] none
-    \retval     none
+    \retval     USB device operation status
 */
-static void custom_hid_data_out (usb_dev *udev, uint8_t ep_num)
+static uint8_t custom_hid_data_out (usb_dev *udev, uint8_t ep_num)
 {
-    custom_hid_handler *hid = (custom_hid_handler *)udev->class_data[CUSTOM_HID_INTERFACE];
+    custom_hid_handler *hid = (custom_hid_handler *)udev->dev.class_data[CUSTOM_HID_INTERFACE];
 
-    if (CUSTOMHID_OUT_EP == ep_num){
-        switch (hid->data[0]){
-        case 0x11:
-            if (RESET != hid->data[1]) {
-                /* turn on led5  */
-                gd_eval_led_on(LED5);
-            } else {
-                gd_eval_led_off(LED5);
-            }
-            break;
-        case 0x12:
-            if (RESET != hid->data[1]) {
-                gd_eval_led_on(LED2);
-            } else {
-                gd_eval_led_off(LED2);
-            }
-            break;
-        case 0x13:
-            if (RESET != hid->data[1]) {
-                gd_eval_led_on(LED3);
-            } else {
-                gd_eval_led_off(LED3);
-            }
-            break;
-        case 0x14:
-            if (RESET != hid->data[1]) {
-                gd_eval_led_on(LED4);
-            } else {
-                gd_eval_led_off(LED4);
-            }
-            break;
-        default:
-            /* turn off all leds */
-            gd_eval_led_off(LED2);
-            gd_eval_led_off(LED3);
-            gd_eval_led_off(LED4);
+    switch (hid->data[0]){
+    case 0x11U:
+        if (RESET != hid->data[1]) {
+            gd_eval_led_on(LED5);
+        } else {
             gd_eval_led_off(LED5);
+        }
+        break;
+
+    case 0x12U:
+        if (RESET != hid->data[1]) {
+            gd_eval_led_on(LED2);
+        } else {
+            gd_eval_led_off(LED2);
+        }
+        break;
+
+    case 0x13U:
+        if (RESET != hid->data[1]) {
+            gd_eval_led_on(LED3);
+        } else {
+            gd_eval_led_off(LED3);
+        }
+        break;
+
+    case 0x14U:
+        if (RESET != hid->data[1]) {
+            gd_eval_led_on(LED4);
+        } else {
+            gd_eval_led_off(LED4);
+        }
+        break;
+
+
+        default:
             break;
         }
 
-        usbd_ep_recev(udev, CUSTOMHID_OUT_EP, hid->data, 2U);
-    }
+    usbd_ep_recev (udev, CUSTOMHID_OUT_EP, hid->data, 2U);
+
+    return USBD_OK;
 }

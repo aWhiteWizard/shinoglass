@@ -25,10 +25,10 @@
 #define KEY_CENTER_GPIO_PORT			GPIOC
 #define KEY_CENTER_GPIO_RCU				RCU_GPIOC
 
-static int earphone_volume=20;
-static int earphone_volume_reg=0;
-static int oled_bright=20;
-static int oled_bright_reg=0;
+static int earphone_volume=0;
+static int earphone_volume_reg=50;
+static int oled_bright=5;
+static int oled_bright_reg=1000;
 
 void Key_Init(void);
 uint8_t Key_GPIO_Read(uint8_t keyNum);

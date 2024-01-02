@@ -154,3 +154,8 @@ void DebugMon_Handler(void)
 //		#endif  
 
 //}
+void USBD_LP_CAN0_RX0_IRQHandler (void)
+{
+    usbd_isr();
+}
+
