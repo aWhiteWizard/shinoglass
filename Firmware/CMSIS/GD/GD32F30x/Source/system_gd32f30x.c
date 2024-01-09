@@ -44,6 +44,7 @@
 //#define __SYSTEM_CLOCK_IRC8M                    (uint32_t)(__IRC8M) 
 //#define __SYSTEM_CLOCK_48M_PLL_IRC8M            (uint32_t)(48000000)
 //#define __SYSTEM_CLOCK_72M_PLL_IRC8M            (uint32_t)(72000000)
+//#define __SYSTEM_CLOCK_96M_PLL_IRC8M            (uint32_t)(96000000)
 //#define __SYSTEM_CLOCK_108M_PLL_IRC8M           (uint32_t)(108000000)
 #define __SYSTEM_CLOCK_120M_PLL_IRC8M           (uint32_t)(120000000)
 
@@ -80,6 +81,9 @@ static void system_clock_48m_irc8m(void);
 #elif defined (__SYSTEM_CLOCK_72M_PLL_IRC8M)
 uint32_t SystemCoreClock = __SYSTEM_CLOCK_72M_PLL_IRC8M;
 static void system_clock_72m_irc8m(void);
+#elif defined (__SYSTEM_CLOCK_96M_PLL_IRC8M)
+uint32_t SystemCoreClock = __SYSTEM_CLOCK_96M_PLL_IRC8M;
+static void system_clock_96m_irc8m(void);
 #elif defined (__SYSTEM_CLOCK_108M_PLL_IRC8M)
 uint32_t SystemCoreClock = __SYSTEM_CLOCK_108M_PLL_IRC8M;
 static void system_clock_108m_irc8m(void);
@@ -164,6 +168,8 @@ static void system_clock_config(void)
     system_clock_48m_irc8m();
 #elif defined (__SYSTEM_CLOCK_72M_PLL_IRC8M)
     system_clock_72m_irc8m();
+#elif defined (__SYSTEM_CLOCK_96M_PLL_IRC8M)
+    system_clock_96m_irc8m();
 #elif defined (__SYSTEM_CLOCK_108M_PLL_IRC8M)
     system_clock_108m_irc8m();
 #elif defined (__SYSTEM_CLOCK_120M_PLL_IRC8M)
@@ -338,6 +344,75 @@ static void system_clock_72m_irc8m(void)
     /* CK_PLL = (CK_IRC8M/2) * 18 = 72 MHz */
     RCU_CFG0 &= ~(RCU_CFG0_PLLMF | RCU_CFG0_PLLMF_4 | RCU_CFG0_PLLMF_5);
     RCU_CFG0 |= RCU_PLL_MUL18;
+
+    /* enable PLL */
+    RCU_CTL |= RCU_CTL_PLLEN;
+
+    /* wait until PLL is stable */
+    while(0U == (RCU_CTL & RCU_CTL_PLLSTB)){
+    }
+    
+    /* enable the high-drive to extend the clock frequency to 120 MHz */
+    PMU_CTL |= PMU_CTL_HDEN;
+    while(0U == (PMU_CS & PMU_CS_HDRF)){
+    }
+    
+    /* select the high-drive mode */
+    PMU_CTL |= PMU_CTL_HDS;
+    while(0U == (PMU_CS & PMU_CS_HDSRF)){
+    }
+    
+    /* select PLL as system clock */
+    RCU_CFG0 &= ~RCU_CFG0_SCS;
+    RCU_CFG0 |= RCU_CKSYSSRC_PLL;
+
+    /* wait until PLL is selected as system clock */
+    while(0U == (RCU_CFG0 & RCU_SCSS_PLL)){
+    }
+}
+
+#elif defined (__SYSTEM_CLOCK_96M_PLL_IRC8M)
+/*!
+    \brief      configure the system clock to 72M by PLL which selects IRC8M as its clock source
+    \param[in]  none
+    \param[out] none
+    \retval     none
+*/
+static void system_clock_96m_irc8m(void)
+{
+    uint32_t timeout = 0U;
+    uint32_t stab_flag = 0U;
+    
+    /* enable IRC8M */
+    RCU_CTL |= RCU_CTL_IRC8MEN;
+
+    /* wait until IRC8M is stable or the startup time is longer than IRC8M_STARTUP_TIMEOUT */
+    do{
+        timeout++;
+        stab_flag = (RCU_CTL & RCU_CTL_IRC8MSTB);
+    }while((0U == stab_flag) && (IRC8M_STARTUP_TIMEOUT != timeout));
+
+    /* if fail */
+    if(0U == (RCU_CTL & RCU_CTL_IRC8MSTB)){
+        while(1){
+        }
+    }
+
+    /* LDO output voltage high mode */
+    RCU_APB1EN |= RCU_APB1EN_PMUEN;
+    PMU_CTL |= PMU_CTL_LDOVS;
+
+    /* IRC8M is stable */
+    /* AHB = SYSCLK */
+    RCU_CFG0 |= RCU_AHB_CKSYS_DIV1;
+    /* APB2 = AHB/1 */
+    RCU_CFG0 |= RCU_APB2_CKAHB_DIV1;
+    /* APB1 = AHB/2 */
+    RCU_CFG0 |= RCU_APB1_CKAHB_DIV2;
+
+    /* CK_PLL = (CK_IRC8M/2) * 24 = 96 MHz */
+    RCU_CFG0 &= ~(RCU_CFG0_PLLMF | RCU_CFG0_PLLMF_4 | RCU_CFG0_PLLMF_5);
+    RCU_CFG0 |= RCU_PLL_MUL24;
 
     /* enable PLL */
     RCU_CTL |= RCU_CTL_PLLEN;
