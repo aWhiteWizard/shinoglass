@@ -8,7 +8,7 @@
 #define HAND_GAMMA              0
 
 #define MCU_INITIAL_PANEL       1   //0:7911 LP TO initial panel;   1: GD32 IIC TO INITIAL PANEL
-#define  input_1920_1080_60Hz        1   
+#define  input_1920_1080_60Hz        1 
 #define  input_2560_1440_60Hz        0  
 #define DSC_19201920_90         0   
 #define DSC_25442544_75Hz      0

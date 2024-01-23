@@ -95,10 +95,10 @@ void Lt7911Upgrade_task(void * pvParameters)
 //		ret = cdc_acm_check_ready(&usbd_cdc);
 			if (0U == cdc_acm_check_ready(&usbd_cdc)) {
 					cdc_acm_data_receive(&usbd_cdc);
-					printf("\r\n[DEBUG] cdc_acm_check_ready == 0");
+//					printf("\r\n[DEBUG] cdc_acm_check_ready == 0");
 			} else {
 					cdc_acm_data_send(&usbd_cdc);
-					printf("\r\n[DEBUG] cdc_acm_check_ready != 0");
+//					printf("\r\n[DEBUG] cdc_acm_check_ready != 0");
 
 			}
 	vTaskDelay(700);
@@ -173,10 +173,10 @@ void icm42688_data_task(void * pvParameters)
 		
 		Temp = (float)((0x00FF & temp[0]) + ((0x00FF & temp[1]) << 8)) / 132.48 + 25;
 		
-		printf("\r\n%s, %d: [DEBUG] AccX : %f. GyroX : %f. ", __FUNCTION__, __LINE__, AccX, GyroX);
-		printf("\r\n%s, %d: [DEBUG] AccY : %f. GyroY : %f. ", __FUNCTION__, __LINE__, AccY, GyroY);
-		printf("\r\n%s, %d: [DEBUG] AccZ : %f. GyroZ : %f. ", __FUNCTION__, __LINE__, AccZ, GyroZ);
-		printf("\r\n%s, %d: [DEBUG] Temp : %f. ", __FUNCTION__, __LINE__,Temp);
+//		printf("\r\n%s, %d: [DEBUG] AccX : %f. GyroX : %f. ", __FUNCTION__, __LINE__, AccX, GyroX);
+//		printf("\r\n%s, %d: [DEBUG] AccY : %f. GyroY : %f. ", __FUNCTION__, __LINE__, AccY, GyroY);
+//		printf("\r\n%s, %d: [DEBUG] AccZ : %f. GyroZ : %f. ", __FUNCTION__, __LINE__, AccZ, GyroZ);
+//		printf("\r\n%s, %d: [DEBUG] Temp : %f. ", __FUNCTION__, __LINE__,Temp);
 
 		vTaskDelay(500);
 	}
@@ -189,6 +189,8 @@ void KeyValue_set_task(void * pvParameters)
 			if(earphone_volume_reg != earphone_volume*10)
 			{	
 					earphone_volume_reg = earphone_volume*10;
+					if(earphone_volume_reg >= 100)
+							earphone_volume_reg = 100;
 					sabre9018_volume_set(earphone_volume_reg);
 					printf("\r\n earphone_volume value = %d", earphone_volume_reg);
 			}
@@ -212,7 +214,7 @@ void Log_print_task(void * pvParameters)
 			if(value == 0)
 			{
 				earphone_volume++;
-				if(earphone_volume > 10)
+				if(earphone_volume >= 10)
 					earphone_volume = 10;
 			}
 			value = Key_GPIO_Read(1);
@@ -233,8 +235,8 @@ void Log_print_task(void * pvParameters)
 			if(value == 0)
 			{
 				oled_bright++;
-				if(oled_bright > 10)
-					oled_bright = 10;
+				if(oled_bright > 9)
+					oled_bright = 9;
 			}
 			value = Key_GPIO_Read(4);
 			if(value == 0)
@@ -262,20 +264,22 @@ void system_init(void)
 		GPIO_INIT();
     I2C_Init();
 //	
-		rcu_config();
-		gpio_config();
-		usbd_init(&usbd_cdc, &cdc_desc, &cdc_class);
-		nvic_config();
-    usbd_connect(&usbd_cdc);
+//		rcu_config();
+//		gpio_config();
+//		usbd_init(&usbd_cdc, &cdc_desc, &cdc_class);
+//		nvic_config();
+//    usbd_connect(&usbd_cdc);
 
     tca9548_i2c_init();
 		tca6408_i2c_init();
-    pannel_init();  
-    tca9548_i2c_set(TCA9548_ALL_DISABLE);
+		tca9548_i2c_set(TCA9548_ALL_DISABLE);
     pca9544_i2c_init();
-		sabre9018_init();
-		icm42688_init();
+
+    pannel_init();  
+//		icm42688_init();
 		Key_Init();
+		sabre9018_init();
+
 }
 
 /*!
@@ -294,8 +298,8 @@ int main(void)
 				xTaskCreate(KeyValue_set_task, "KeyValue_task", configMINIMAL_STACK_SIZE, NULL, KeyValue_PRIO,(TaskHandle_t *)KeyValueTask_Handle);
 				xTaskCreate(Log_print_task, "LogPrint_task", configMINIMAL_STACK_SIZE, NULL, LogPrint_PRIO,(TaskHandle_t *)LogPrintTask_Handle);
 				xTaskCreate(USART_cmd_task, "UsartCmd_task", configMINIMAL_STACK_SIZE, NULL, UsartCmd_PRIO,(TaskHandle_t *)USARTCMDTask_Handle);
-				xTaskCreate(icm42688_data_task, "icm42688_task", configMINIMAL_STACK_SIZE, NULL, icm42688_PRIO,(TaskHandle_t *)icm42688Task_Handle);
-				xTaskCreate(Lt7911Upgrade_task, "icm42688_task", configMINIMAL_STACK_SIZE, NULL, Lt7911Upgrade_PRIO,(TaskHandle_t *)LT7911UpgradeTask_Handle);
+//				xTaskCreate(icm42688_data_task, "icm42688_task", configMINIMAL_STACK_SIZE, NULL, icm42688_PRIO,(TaskHandle_t *)icm42688Task_Handle);
+//				xTaskCreate(Lt7911Upgrade_task, "icm42688_task", configMINIMAL_STACK_SIZE, NULL, Lt7911Upgrade_PRIO,(TaskHandle_t *)LT7911UpgradeTask_Handle);
 			
 				vTaskStartScheduler();
 		}

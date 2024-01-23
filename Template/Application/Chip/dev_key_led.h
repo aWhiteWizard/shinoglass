@@ -26,7 +26,7 @@
 #define KEY_CENTER_GPIO_RCU				RCU_GPIOC
 
 static int earphone_volume=0;
-static int earphone_volume_reg=50;
+static int earphone_volume_reg=0;
 static int oled_bright=5;
 static int oled_bright_reg=1000;
 

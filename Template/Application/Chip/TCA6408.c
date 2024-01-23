@@ -10,25 +10,34 @@
 int tca6408_i2c_init(void)
 {
 		int ret;
-		unsigned char set_param[2]= {0x00, 0xff};
+		unsigned char set_param[3]= {0xff, 0xDF, 0x80};
 		unsigned char buf[1];
 		ret = tca9548_i2c_set(TCA6408_CHANNEL);
 		if(ret != 0)
 			printf("\r\n%s, %d: [ERROR] init TCA6408 ret = %d,write buf = 0x%x", __FUNCTION__, __LINE__, ret, buf[0]);
+		
 		DEV_I2C_Write(TCA6408_IIC_BUS, (unsigned char)TCA6408_IIC_ADDR, TCA6408_POLARITY, 1, &set_param[0], 1);
 		ret = DEV_I2C_Read(TCA6408_IIC_BUS, (unsigned char)TCA6408_IIC_ADDR ,TCA6408_POLARITY , 1,buf, 1);
 		if(buf[0] != 0x00)
 		{
 				printf("\r\n%s, %d [ERROR] init TCA6408 POLARITY is not 0x00 please check! get polarity is 0x%x.", __FUNCTION__, __LINE__ ,buf[0]);
 		}
-		printf("\r\n %s, %d [DEBUG] get Read TCA6408 ret = %d,get buf = 0x%x", __FUNCTION__, __LINE__, ret, buf[0]);
+		printf("\r\n %s, %d [DEBUG] get Read TCA6408 POLARITY ret = %d,get buf = 0x%x", __FUNCTION__, __LINE__, ret, buf[0]);
 		DEV_I2C_Write(TCA6408_IIC_BUS, (unsigned char)TCA6408_IIC_ADDR, TCA6408_CONFIG, 1, &set_param[1], 1);
 		ret = DEV_I2C_Read(TCA6408_IIC_BUS, (unsigned char)TCA6408_IIC_ADDR ,TCA6408_CONFIG , 1,buf, 1);
 		if(buf[0] != 0xFF)
 		{
 				printf("\r\n%s, %d [ERROR] init TCA6408 CONFIG is not 0xFF please check! get config is 0x%x.", __FUNCTION__, __LINE__ ,buf[0]);
 		}
-		printf("\r\n%s, %d: [DEBUG] get Read TCA6408 ret = %d,get buf = 0x%x", __FUNCTION__, __LINE__ , ret, buf[0]);
+		printf("\r\n%s, %d: [DEBUG] get Read TCA6408 CONFIG ret = %d,get buf = 0x%x", __FUNCTION__, __LINE__ , ret, buf[0]);
+		
+		DEV_I2C_Write(TCA6408_IIC_BUS, (unsigned char)TCA6408_IIC_ADDR, TCA6408_OUTPUT, 1, &set_param[2], 1);
+		ret = DEV_I2C_Read(TCA6408_IIC_BUS, (unsigned char)TCA6408_IIC_ADDR ,TCA6408_OUTPUT , 1,buf, 1);
+		if(buf[0] != 0xFF)
+		{
+				printf("\r\n%s, %d [ERROR] init TCA6408 OUTPUT is not 0x80 please check! get config is 0x%x.", __FUNCTION__, __LINE__ ,buf[0]);
+		}
+		printf("\r\n%s, %d: [DEBUG] get Read TCA6408 OUTPUT ret = %d,get buf = 0x%x", __FUNCTION__, __LINE__ , ret, buf[0]);
 		return 0;
 }
 /*
@@ -45,7 +54,11 @@ int tca6408_write(unsigned char send_data, unsigned char reg_addr)
 		if(ret != 0)
 				printf("\r\n%s, %d [ERROR] init TCA6408 ret = %d,write buf = 0x%x", __FUNCTION__, __LINE__, ret, buf[0]);
 
-		DEV_I2C_Write(TCA6408_IIC_BUS, (unsigned char)TCA6408_IIC_ADDR, reg_addr, 1, set_param, 1);
+		ret = DEV_I2C_Write(TCA6408_IIC_BUS, (unsigned char)TCA6408_IIC_ADDR, reg_addr, 1, set_param, 1);
+		if(ret != 0)
+				printf("\r\n%s, %d [ERROR] init TCA6408 ret = %d,write buf = 0x%x", __FUNCTION__, __LINE__, ret, buf[0]);
+		printf("\r\n%s %d: [DEBUG] get Read TCA6408 ret = %d,set buf = 0x%x" , __FUNCTION__ , __LINE__, ret, set_param[0]);
+
 		ret = DEV_I2C_Read(TCA6408_IIC_BUS, (unsigned char)TCA6408_IIC_ADDR ,reg_addr , 1,buf, 1);
 		if(buf[0] != send_data)
 		{

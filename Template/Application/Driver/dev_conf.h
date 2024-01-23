@@ -251,6 +251,11 @@
 #define PANEL_RSTN_PIN          GPIO_PIN_2
 #define PANEL_RSTN_PORT         GPIOB
 
+//pannel reset
+#define TCA6408_INT_RCU          RCU_GPIOB
+#define TCA6408_INT_PIN          GPIO_PIN_9
+#define TCA6408_INT_PORT         GPIOB
+
 //LT7911 
 #define LT7911_RST 0x10			// RST = 7211 reset
 #define LT7911_GPIO_14 0x20 // GPIO_14 = 3d switch 

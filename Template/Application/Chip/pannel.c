@@ -10,7 +10,7 @@
 
 void GPIO_rst_Init(void)
 {
-		unsigned char init_config = TCA6408_LV7911_GPIO_16 | TCA6408_LV7911_RST_N;
+		unsigned char init_config = TCA6408_LV7911_GPIO_16;// | TCA6408_LV7911_RST_N;
 		tca6408_write(init_config, TCA6408_OUTPUT);
 }
 
@@ -160,7 +160,7 @@ void pannel_config_303(void)
 		
     Write_I2C(0x6B00,0x10);
 
-    Write_I2C(0x8000,0x01);//01 //FHD with 60Hz use 0x00, others use 0x01
+    Write_I2C(0x8000,0x00);//01 //FHD with 60Hz use 0x00, others use 0x01
     Write_I2C(0x8001,0x40);
     Write_I2C(0x8002,0xb4);
     Write_I2C(0x8003,0x10);
@@ -171,17 +171,17 @@ void pannel_config_303(void)
     Write_I2C(0x8100,0x02);
     Write_I2C(0x8101,0x56);
     Write_I2C(0x8102,0x00);
-    Write_I2C(0x8103,0x09);
+    Write_I2C(0x8103,0x05);//09
     Write_I2C(0x8104,0x00);
-    Write_I2C(0x8105,0x0f);
+    Write_I2C(0x8105,0x23);//0f
     Write_I2C(0x8106,0x00);
 
     Write_I2C(0x8200,0x02);
     Write_I2C(0x8201,0x56);
     Write_I2C(0x8202,0x00);
-    Write_I2C(0x8203,0x09);
+    Write_I2C(0x8203,0x05); //09
     Write_I2C(0x8204,0x00);
-    Write_I2C(0x8205,0x0f);
+    Write_I2C(0x8205,0x23);//0f
     Write_I2C(0x8206,0x00);
 
     Write_I2C(0x2500,0x01);   
@@ -297,17 +297,17 @@ void pannel_config_303(void)
     Write_I2C(0x8100,0x02);
     Write_I2C(0x8101,0x56);
     Write_I2C(0x8102,0x00);
-    Write_I2C(0x8103,0x09);
+    Write_I2C(0x8103,0x05);//09
     Write_I2C(0x8104,0x00);
-    Write_I2C(0x8105,0x0f);
+    Write_I2C(0x8105,0x23);//0f
     Write_I2C(0x8106,0x00);
 
     Write_I2C(0x8200,0x02);
     Write_I2C(0x8201,0x56);
     Write_I2C(0x8202,0x00);
-    Write_I2C(0x8203,0x09);
+    Write_I2C(0x8203,0x05);//09
     Write_I2C(0x8204,0x00);
-    Write_I2C(0x8205,0x0f);
+    Write_I2C(0x8205,0x23);//0f
     Write_I2C(0x8206,0x00);
 
     Write_I2C(0x2500,0x01);   
@@ -345,6 +345,7 @@ void pannel_config_303(void)
     Write_I2C(0xBF01,0xBE);
 //rotation begin
     Write_I2C(0x3600,0x03);  //180degree
+		
     Write_I2C(0xF000,0xAA);
     Write_I2C(0xF001,0x13);
 
